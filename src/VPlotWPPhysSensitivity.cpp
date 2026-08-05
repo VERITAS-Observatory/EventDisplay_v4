@@ -585,7 +585,7 @@ bool VPlotWPPhysSensitivity::plotSensitivity( string iPrint, double iMinSensitiv
             TCanvas* c_temp = 0;
             // cSens name = cSensitivity (default from VSensitivityCalculator::fPlot_CanvasName )
             c_temp = a->plotDifferentialSensitivityvsEnergyFromCrabSpectrum( cSens, "CTA-PHYS", fData[i]->fPlottingColor[j], iUnit,
-                0.2, fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
+                     0.2, fData[i]->fSiteFile_Emin[j], fData[i]->fSiteFile_Emax[j] );
             if( c_temp )
             {
                 cSens = c_temp;

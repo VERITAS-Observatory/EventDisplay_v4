@@ -1175,7 +1175,7 @@ bool VDataMCComparision::fillHistograms( string ifile, int iSingleTelescopeCuts 
                 if( fData->ntubes[iTelImage] > ntubes_min )
                 {
                     rdist1 = VUtilities::line_point_distance( fData->Ycore, -1.*fData->Xcore, 0., fData->Ze, fData->Az,
-                        fTel_y[iTelImage], -1.*fTel_x[iTelImage], fTel_z[iTelImage] );
+                             fTel_y[iTelImage], -1.*fTel_x[iTelImage], fTel_z[iTelImage] );
                     // camera distance is calculated relative to centre of camera (should be: wobble offset position)
                     hdistR[iTelImage]->Fill( rdist1, sqrt( fData->cen_x[iTelImage]*fData->cen_x[iTelImage]
                                                            + fData->cen_y[iTelImage]*fData->cen_y[iTelImage] ), weight );

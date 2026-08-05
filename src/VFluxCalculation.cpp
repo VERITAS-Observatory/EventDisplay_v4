@@ -1643,7 +1643,7 @@ void VFluxCalculation::calculateSignificancesAndUpperLimits()
                     if( IntraSigni[t] < fThresholdSignificance || fIntraRunNon[i][t] < fMinEvents )
                     {
                         IntraUFL.push_back( VStatistics::calcUpperLimit( fIntraRunNon[i][t], fIntraRunNoff[i][t],
-                            fRunNorm[i], fUpperLimit, fUpperLimitMethod ) );
+                                            fRunNorm[i], fUpperLimit, fUpperLimitMethod ) );
                         IntraCI_lo_1sigma.push_back( -99. );
                         IntraCI_up_1sigma.push_back( -99. );
                         IntraCI_lo_3sigma.push_back( -99. );

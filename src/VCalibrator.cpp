@@ -3115,9 +3115,9 @@ void VCalibrator::initialize()
         setTelID( i );
 
         fCalData.push_back( new VCalibrationData( i, fRunPar->getDirectory_EVNDISPCalibrationData(),
-                fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i],
-                "", "", "", fTZeroFileNameC[i], fLowGainTZeroFileNameC[i],
-                getRunParameter()->getObservatory() ) );
+                            fPedFileNameC[i], fGainFileNameC[i], fToffFileNameC[i], fLowGainPedFileNameC[i],
+                            "", "", "", fTZeroFileNameC[i], fLowGainTZeroFileNameC[i],
+                            getRunParameter()->getObservatory() ) );
         fCalData.back()->setSumWindows( getSumWindow( i ) );
         fNumberGainEvents.push_back( 0 );
         fNumberTZeroEvents.push_back( 0 );

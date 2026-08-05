@@ -1087,7 +1087,7 @@ TTree* CData::getXGBTree( string file_name, string file_suffix, string tree_name
     {
         file_name += "." + file_suffix + ".root";
     }
-    TFile *iFile = TFile::Open( file_name.c_str() );
+    TFile* iFile = TFile::Open( file_name.c_str() );
     if( !iFile || iFile->IsZombie() )
     {
         cout << "CData warning: cannot open XGB file " << file_name << endl;

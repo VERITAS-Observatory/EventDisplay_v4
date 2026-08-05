@@ -559,7 +559,7 @@ int main( int argc, char* argv[] )
     cout << endl;
 
     vector< TProfile2D* > hRateProfileHisto = initializeRateProfileHistos(
-            fEffAreaFile, fTMVAParameterFile, tmp_ebins_histo );
+                fEffAreaFile, fTMVAParameterFile, tmp_ebins_histo );
 
     TTree* fMC = fillMCRates(
                      fEffAreaFile, hRateProfileHisto[0],

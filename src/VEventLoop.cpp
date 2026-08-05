@@ -624,9 +624,9 @@ void VEventLoop::initializeAnalyzers()
             }
             setTelID( i );
             fAnaData.push_back( new VImageAnalyzerData( i, fRunPar->fShortTree, ( fRunMode == R_PED || fRunMode == R_PEDLOW ||
-                    fRunMode == R_GTO || fRunMode == R_GTOLOW ||
-                    fRunMode == R_TZERO || fRunMode == R_TZEROLOW ),
-                    getRunParameter()->fWriteImagePixelList ) );
+                                fRunMode == R_GTO || fRunMode == R_GTOLOW ||
+                                fRunMode == R_TZERO || fRunMode == R_TZEROLOW ),
+                                getRunParameter()->fWriteImagePixelList ) );
             int iseed = fRunPar->fMCNdeadSeed;
             if( iseed != 0 )
             {
@@ -650,9 +650,9 @@ void VEventLoop::initializeAnalyzers()
             if( getTeltoAna()[i] < fAnaData.size() && fAnaData[getTeltoAna()[i]] )
             {
                 fAnaData[getTeltoAna()[i]]->readSpecialChannels( getRunNumber(), fRunPar->getInstrumentEpoch(),
-                    fRunPar->fsetSpecialChannels,
-                    fRunPar->fthroughputCorrectionFile,
-                    getRunParameter()->getDirectory_EVNDISPParameterFiles() );
+                        fRunPar->fsetSpecialChannels,
+                        fRunPar->fthroughputCorrectionFile,
+                        getRunParameter()->getDirectory_EVNDISPParameterFiles() );
             }
         }
         // initialize cleaning

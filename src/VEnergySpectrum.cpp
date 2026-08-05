@@ -691,7 +691,7 @@ void VEnergySpectrum::addValueToHistogram( TH1* h, TGraph* g, double iTObs, doub
     for( int i = 1; i <= h->GetNbinsX(); i++ )
     {
         double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, h->GetXaxis()->GetBinLowEdge( i ),
-            h->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
+                   h->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
         if( x < -1.e90 )
         {
             continue;
@@ -975,7 +975,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         }
         // adjust energy (e.g. to spectral weighted bin value)
         double x = VMathsandFunctions::getMeanEnergyInBin( fEnergyInBinDefinition, hErecCountsOn->GetXaxis()->GetBinLowEdge( i ),
-            hErecCountsOn->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
+                   hErecCountsOn->GetXaxis()->GetBinUpEdge( i ), fPlottingSpectralWeightForBinCenter );
         if( fEnergyInBinDefinition > 90 )
         {
             cout << "VEnergySpectrum::calculateDifferentialFluxes() invalid fEnergyInBinDefinition: " << fEnergyInBinDefinition << endl;
@@ -1103,7 +1103,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         else
         {
             i_flux.DifferentialFlux = VStatistics::calcUpperLimit( i_flux.NOn, i_flux.NOff, fTotalNormalisationFactor,
-                fAnalysisUpperLimits, fAnalysisUpperLimitAlgorithm );
+                                      fAnalysisUpperLimits, fAnalysisUpperLimitAlgorithm );
             // scale  upper flux to right value
             if( i_flux.DifferentialFlux > 0. && hEffArea )
             {
