@@ -9,6 +9,20 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
+## [v492.0-rc6](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0-rc6) - 2026-08-05
+
+### Bugfixes
+
+- Fix branch name of 95% containment radius in IRFs (name included 80). ([#366](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/366))
+- Add theta vs reconstructed-energy histograms in anasum (hthetaErec/htheta2Erec) and fill them consistently with theta2 weights/selection. ([#367](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/367))
+
+### New Feature
+
+- Add XGB-based gamma/hadron classification routines. Use with `* cutselection 52 0` in cut files. ([#337](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/337))
+- Add Eventdisplay-ML package to docker container. ([#364](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/364))
+- Improve data / MC comparison for directional variables. ([#366](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/366))
+
+
 ## v492.0 (in development)
 
 ### New Feature
