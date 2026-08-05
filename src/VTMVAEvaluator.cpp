@@ -199,7 +199,7 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
             string iFullFileName = getBDTFileName( iWeightFileName,
                                                    iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, ".root" );
             string iFullFileNameXML = getBDTFileName( iWeightFileName,
-                iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, "_0.weights.xml" );
+                                      iWeightFileIndex_Emin + i, iWeightFileIndex_Zmin + j, "_0.weights.xml" );
 
             bool bGoodRun = true;
             VTMVARunDataEnergyCut* iEnergyData = 0;
@@ -301,9 +301,9 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 
                 // calculate spectral weighted mean energy
                 fTMVAData.back()->fSpectralWeightedMeanEnergy_Log10TeV =
-                             VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
-                                 fTMVAData.back()->fEnergyCut_Log10TeV_max,
-                                 fSpectralIndexForEnergyWeighting );
+                    VMathsandFunctions::getSpectralWeightedMeanEnergy( fTMVAData.back()->fEnergyCut_Log10TeV_min,
+                            fTMVAData.back()->fEnergyCut_Log10TeV_max,
+                            fSpectralIndexForEnergyWeighting );
                 // zenith angle range
                 if( iZenithData )
                 {
@@ -318,17 +318,17 @@ bool VTMVAEvaluator::initializeWeightFiles( string iWeightFileName,
 
 
                 fTMVAData.back()->fSignalEfficiency = getSignalEfficiency( iWeightFileIndex_Emin + i,
-                    iEnergyData->fEnergyCut_Log10TeV_min,
-                    iEnergyData->fEnergyCut_Log10TeV_max,
-                    iWeightFileIndex_Zmin + j,
-                    fTMVAData.back()->fZenithCut_min,
-                    fTMVAData.back()->fZenithCut_max );
+                                                      iEnergyData->fEnergyCut_Log10TeV_min,
+                                                      iEnergyData->fEnergyCut_Log10TeV_max,
+                                                      iWeightFileIndex_Zmin + j,
+                                                      fTMVAData.back()->fZenithCut_min,
+                                                      fTMVAData.back()->fZenithCut_max );
                 fTMVAData.back()->fTMVACutValue = getTMVACutValue( iWeightFileIndex_Emin + i,
-                    iEnergyData->fEnergyCut_Log10TeV_min,
-                    iEnergyData->fEnergyCut_Log10TeV_max,
-                    iWeightFileIndex_Zmin + j,
-                    fTMVAData.back()->fZenithCut_min,
-                    fTMVAData.back()->fZenithCut_max );
+                                                  iEnergyData->fEnergyCut_Log10TeV_min,
+                                                  iEnergyData->fEnergyCut_Log10TeV_max,
+                                                  iWeightFileIndex_Zmin + j,
+                                                  fTMVAData.back()->fZenithCut_min,
+                                                  fTMVAData.back()->fZenithCut_max );
                 fTMVAData.back()->fBackgroundEfficiency = -99.;
                 fTMVAData.back()->fTMVAOptimumCutValueFound = false;
                 fTMVAData.back()->fSourceStrengthAtOptimum_CU = 0.;
@@ -983,7 +983,7 @@ void VTMVAEvaluator::plotSignalAndBackgroundEfficiencies( bool iLogY, double iYm
     char htitle[200];
     for( unsigned int j = 0; j < i_n_ze_bins; j++ )
     {
-        TPad *iPad = ( TPad* )iCanvas->cd( j + 1 );
+        TPad* iPad = ( TPad* )iCanvas->cd( j + 1 );
         iPad->SetLeftMargin( 0.13 );
         sprintf( hname, "hnullcSignalEfficiencies_%d", j );
         sprintf( htitle, "signal efficiency (ze %d)", j );
@@ -1397,10 +1397,10 @@ bool VTMVAEvaluator::optimizeSensitivity( unsigned int iDataBin )
                     cout << i << "\t" << Non << "\t" << signalEff  << "\t";
                     cout << Nof << "\t" << backEff << "\t";
                     cout << Ndif << endl;
-                    cout << "\t" << signalEff * Ndif;
-                    cout << "\t" << signalEff * Ndif + backEff * Nof;
-                    cout << "\t" << signalEff * Non + backEff * Nof;
-                    cout << "\t" << backEff * Nof << endl;
+                    cout << "\t" << signalEff* Ndif;
+                    cout << "\t" << signalEff* Ndif + backEff* Nof;
+                    cout << "\t" << signalEff* Non + backEff* Nof;
+                    cout << "\t" << backEff* Nof << endl;
                 }
                 if( signalEff * Ndif > 0. )
                 {

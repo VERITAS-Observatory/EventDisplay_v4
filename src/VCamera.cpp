@@ -150,7 +150,7 @@ void VCamera::setUpCamera()
         // channel numbering
         sprintf( c_number, "%d", i );
         fTextChannelNumber.push_back( new TText( fgraphTubes.back()->GetX1() - fgraphTubes.back()->GetR1() / 1.4,
-                fgraphTubes.back()->GetY1() - fgraphTubes.back()->GetR2() / 2., c_number ) );
+                                      fgraphTubes.back()->GetY1() - fgraphTubes.back()->GetR2() / 2., c_number ) );
         fTextChannelNumber.back()->SetTextFont( 42 );
         fTextChannelNumber.back()->SetTextSize( 0.015 );
         fTextChannelNumber.back()->SetUniqueID( 200000 + i );

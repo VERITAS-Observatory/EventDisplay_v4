@@ -224,7 +224,7 @@ void VArrayAnalyzer::initEvent()
             if( getTeltoAna()[i] < getPointing().size() && getPointing()[getTeltoAna()[i]] )
             {
                 getPointing()[getTeltoAna()[i]]->setTelPointing( getShowerParameters()->MJD, getShowerParameters()->time,
-                    getRunParameter()->fDBTracking, true );
+                        getRunParameter()->fDBTracking, true );
             }
         }
     }
@@ -716,9 +716,9 @@ void VArrayAnalyzer::selectShowerImages( unsigned int iMeth )
         // apply array analysis cuts
         updatePointingToStarCatalogue( t );
         getShowerParameters()->fTelIDImageSelected[iMeth].back() = fEvndispReconstructionParameter->applyArrayAnalysisCuts( iMeth, t, iTelType,
-            getImageParameters( getRunParameter()->fImageLL ),
-            getReader()->getLocalTriggerType( t ),
-            getStarCatalogue() );
+                getImageParameters( getRunParameter()->fImageLL ),
+                getReader()->getLocalTriggerType( t ),
+                getStarCatalogue() );
         // apply cut on image distance to stars
 
         ///////////////////////////
@@ -1048,9 +1048,9 @@ void VArrayAnalyzer::checkPointing()
             if( i < getPointing().size() && getPointing()[i] )
             {
                 iPointingDiff = ( float )VSkyCoordinatesUtilities::angularDistance( getPointing()[i]->getTelAzimuth() / TMath::RadToDeg(),
-                    ( 90. - getPointing()[i]->getTelElevation() ) / TMath::RadToDeg(),
-                    getReader()->getArrayTrigger()->getAzimuth( ivbf ) / TMath::RadToDeg(),
-                    ( 90. - getReader()->getArrayTrigger()->getAltitude( ivbf ) ) / TMath::RadToDeg() );
+                                ( 90. - getPointing()[i]->getTelElevation() ) / TMath::RadToDeg(),
+                                getReader()->getArrayTrigger()->getAzimuth( ivbf ) / TMath::RadToDeg(),
+                                ( 90. - getReader()->getArrayTrigger()->getAltitude( ivbf ) ) / TMath::RadToDeg() );
 
                 getShowerParameters()->fTelPointingMismatch[i] = iPointingDiff;
                 getShowerParameters()->fTelPointingErrorX[i] = getPointing()[i]->getPointingErrorX();

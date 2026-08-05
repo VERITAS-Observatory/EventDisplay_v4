@@ -969,8 +969,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
     {
         // check L1 rates
         vector< unsigned int > iL1Rates_dead = getDBPixelDataReader()->getL1_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
-            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_min(),
-            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_max() );
+                                               getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_min(),
+                                               getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_L1Rates_max() );
         // do not allow L1 rates to kill a significant part of the camera
         if( iL1Rates_dead.size() < getNChannels() / 2 )
         {
@@ -984,8 +984,8 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
         }
         // check measured HVs
         vector< unsigned int > iHV_dead = getDBPixelDataReader()->getHV_DeadChannelList( getTelID(), getEventMJD(), getEventTime(),
-            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_min(),
-            getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_max() );
+                                          getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_min(),
+                                          getDeadChannelFinder( iLowGain && getLowGainTOff() )->getDeadChannelDefinition_HVrms_max() );
         // do not allow HV to kill a significant part of the camera
         if( iHV_dead.size() < getNChannels() / 2 )
         {

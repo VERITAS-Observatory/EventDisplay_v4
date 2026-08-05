@@ -254,7 +254,7 @@ void VTableLookup::setMCTableFiles( string itablefile, double ize, int woff, vec
                 i_mscl.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
                 // energy reconstruction
                 i_energySR.push_back( new VTableCalculator( "energySR", isuff.c_str(), freadwrite, fDirEnergySR, true, fTLRunParameter->fPE,
-                        fTLRunParameter->fUseMedianEnergy ) );
+                                      fTLRunParameter->fUseMedianEnergy ) );
                 i_energySR.back()->setWrite1DHistograms( fWrite1DHistograms );
                 i_energySR.back()->setMinRequiredShowerPerBin( fTLRunParameter->fMinRequiredShowerPerBin );
                 tel_counter++;
@@ -410,7 +410,7 @@ void VTableLookup::setMCTableFiles( string itablefile, string isuff, string iInt
                     iDirTel->cd( iDNameTel[t].c_str() );
 
                     // NOISE LEVEL
-                    TDirectory *iDirNoise = gDirectory;
+                    TDirectory* iDirNoise = gDirectory;
                     vector< string > iDNameNoise = getSortedListOfDirectories( iDirNoise );
                     for( unsigned int n = 0; n < iDNameNoise.size(); n++ )
                     {
@@ -579,7 +579,7 @@ void VTableLookup::fillLookupTable()
                     {
                         // fill tables (get arrays filled for corresponding telescope type; one table per type)
                         fmscw[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s,
-                            fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
+                                fData->getWidth( t ), idummy1, iEventWeight, idummy3, idummy1 );
                         fmscl[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s,
                                 fData->getLength( t ), idummy1, iEventWeight, idummy3, idummy1 );
                         fenergySizevsRadius[0][0][w][a][i_Tel_type_counter]->calc( i_type, i_r, i_s,
@@ -625,13 +625,13 @@ void VTableLookup::readLookupTable()
     unsigned int iwoff_up = 0;
     unsigned int iwoff_low = 0;
 
-    VTablesToRead *s_ZupWup    = new VTablesToRead( fNTel );
-    VTablesToRead *s_ZupWlow   = new VTablesToRead( fNTel );
-    VTablesToRead *s_Zup       = new VTablesToRead( fNTel );
-    VTablesToRead *s_ZlowWup   = new VTablesToRead( fNTel );
-    VTablesToRead *s_ZlowWlow  = new VTablesToRead( fNTel );
-    VTablesToRead *s_Zlow      = new VTablesToRead( fNTel );
-    VTablesToRead *s_N         = new VTablesToRead( fNTel );
+    VTablesToRead* s_ZupWup    = new VTablesToRead( fNTel );
+    VTablesToRead* s_ZupWlow   = new VTablesToRead( fNTel );
+    VTablesToRead* s_Zup       = new VTablesToRead( fNTel );
+    VTablesToRead* s_ZlowWup   = new VTablesToRead( fNTel );
+    VTablesToRead* s_ZlowWlow  = new VTablesToRead( fNTel );
+    VTablesToRead* s_Zlow      = new VTablesToRead( fNTel );
+    VTablesToRead* s_N         = new VTablesToRead( fNTel );
 
     // first event
     bool bFirst = true;

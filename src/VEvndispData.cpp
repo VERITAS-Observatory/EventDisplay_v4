@@ -1115,8 +1115,8 @@ double VEvndispData::getAverageElevation()
         for( float i = i_start; i < i_stopp; i++ )
         {
             VSkyCoordinatesUtilities::getHorizontalCoordinates( getRunParameter()->fDBDataStartTimeMJD, i,
-                getRunParameter()->fTargetDec, getRunParameter()->fTargetRA,
-                az, ze );
+                    getRunParameter()->fTargetDec, getRunParameter()->fTargetRA,
+                    az, ze );
             iAverageElevation += 90. - ze;
             iN++;
         }

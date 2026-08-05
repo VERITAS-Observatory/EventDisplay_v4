@@ -1692,9 +1692,9 @@ void VDisplay::drawCalibrationHistos()
         if( fSelectedChan >= 200000 )
         {
             ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
-                false, fEventLoop->getTelType( fTelescope ) );
+                    false, fEventLoop->getTelType( fTelescope ) );
             ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
-                true, fEventLoop->getTelType( fTelescope ) );
+                    true, fEventLoop->getTelType( fTelescope ) );
         }
         else
         {
@@ -1712,9 +1712,9 @@ void VDisplay::drawCalibrationHistos()
         if( fSelectedChan >= 200000 )
         {
             ihis = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
-                false, fEventLoop->getTelType( fTelescope ) );
+                    false, fEventLoop->getTelType( fTelescope ) );
             ihis2 = fEventLoop->getCalData( fTelescope )->getHistoPed( fTelescope, iChannel, fEventLoop->getRunParameter()->fsumwindow_1[fTelescope],
-                true, fEventLoop->getTelType( fTelescope ) );
+                    true, fEventLoop->getTelType( fTelescope ) );
         }
         else
         {
@@ -1756,7 +1756,7 @@ void VDisplay::drawCalibrationHistos()
         if( fEventLoop->getDBPixelDataReader() )
         {
             ihis = fEventLoop->getDBPixelDataReader()->getL1Histogram( fTelescope, fEventLoop->getEventMJD(),
-                fEventLoop->getEventTime() );
+                    fEventLoop->getEventTime() );
         }
     }
     // HV
@@ -1765,7 +1765,7 @@ void VDisplay::drawCalibrationHistos()
         if( fEventLoop->getDBPixelDataReader() )
         {
             ihis = fEventLoop->getDBPixelDataReader()->getHVHistogram( fTelescope, fEventLoop->getEventMJD(),
-                fEventLoop->getEventTime() );
+                    fEventLoop->getEventTime() );
         }
     }
     // Currents
@@ -1774,7 +1774,7 @@ void VDisplay::drawCalibrationHistos()
         if( fEventLoop->getDBPixelDataReader() )
         {
             ihis = fEventLoop->getDBPixelDataReader()->getCurrentsHistogram( fTelescope, fEventLoop->getEventMJD(),
-                fEventLoop->getEventTime() );
+                    fEventLoop->getEventTime() );
         }
     }
 

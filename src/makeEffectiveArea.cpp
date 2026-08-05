@@ -301,8 +301,8 @@ int main( int argc, char* argv[] )
                     for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
                     {
                         fEffectiveAreaCalculator.setAngularResolutionGraph( i,
-                            f_IRF[f]->getAngularResolutionGraph( i, 0 ),
-                            false );
+                                f_IRF[f]->getAngularResolutionGraph( i, 0 ),
+                                false );
                         fEffectiveAreaCalculator.setAngularResolution2D( i,
                                 f_IRF[f]->getAngularResolution2D( i, 0 ) );
                     }
@@ -312,8 +312,8 @@ int main( int argc, char* argv[] )
                     for( unsigned int i = 0; i < fRunPara->fAzMin.size(); i++ )
                     {
                         fEffectiveAreaCalculator.setAngularResolutionGraph( i,
-                            f_IRF[f]->getAngularResolutionGraph( i, 0 ),
-                            true );
+                                f_IRF[f]->getAngularResolutionGraph( i, 0 ),
+                                true );
                     }
                 }
             }

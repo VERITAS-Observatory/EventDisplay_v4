@@ -467,8 +467,8 @@ void VLikelihoodFitter::printRunInfo()
     for( unsigned int i = 0; i < fRunList.size(); i++ )
     {
         cout << i << "\t" << fRunList[i].runnumber << "\t" << fRunList[i].MJD << "\t" << fRunList[i].tOn* fRunList[i].deadTimeFraction <<
-                     "\t\t" << fTotalOn[i] << "\t\t" << fTotalOff[i] << "\t\t" << fRunList[i].alpha  <<
-                     "\t\t" << TMath::Power( 10, fLastOn[i] ) << "\t\t" << TMath::Power( 10, fLastOff[i] ) <<  endl;
+             "\t\t" << fTotalOn[i] << "\t\t" << fTotalOff[i] << "\t\t" << fRunList[i].alpha  <<
+             "\t\t" << TMath::Power( 10, fLastOn[i] ) << "\t\t" << TMath::Power( 10, fLastOff[i] ) <<  endl;
 
         // Adding totals
         i_total_tOn += fRunList[i].tOn * fRunList[i].deadTimeFraction;

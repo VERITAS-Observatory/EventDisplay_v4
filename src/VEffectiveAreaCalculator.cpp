@@ -205,9 +205,9 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
 
     sprintf( hname, "hEsysMCRelative2DNoDirectionCut" );
     hEsysMCRelative2DNoDirectionCut = new TH2F( hname,
-        "energy reconstruction, after gamma-selection cuts",
-        fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
-        fBiasBin, 0., 3. ); // default binning y:300 -> 150
+            "energy reconstruction, after gamma-selection cuts",
+            fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+            fBiasBin, 0., 3. ); // default binning y:300 -> 150
     hEsysMCRelative2DNoDirectionCut->SetXTitle( "energy_{MC} [TeV]" );
     hEsysMCRelative2DNoDirectionCut->SetYTitle( "energy bias E_{rec}/E_{MC}" );
     hisTreeList->Add( hEsysMCRelative2DNoDirectionCut );
@@ -263,8 +263,8 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( VInstrumentResponseFunctionR
     // without direction cut
     sprintf( hname, "hResponseMatrixNoDirectionCut" );
     hResponseMatrixNoDirectionCut = new TH2F( hname, "migration matrix, after gamma-selection cuts",
-        fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
-        fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
+            fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue,
+            fhistoNEbins, fEnergyAxis_minimum_defaultValue, fEnergyAxis_maximum_defaultValue );
     hResponseMatrixNoDirectionCut->SetYTitle( "energy_{MC} [TeV]" );
     hResponseMatrixNoDirectionCut->SetXTitle( "energy_{rec} [TeV]" );
     //hisTreeList->Add( hResponseMatrixNoDirectionCut );
@@ -974,9 +974,9 @@ VEffectiveAreaCalculator::VEffectiveAreaCalculator( string iInputFile, double az
             bEffectiveAreasareFunctions = true;
         }
         else if( initializeEffectiveAreasFromHistograms( ( TTree* )gDirectory->Get( "fEffArea" ),
-                ( TH1D* )gDirectory->Get( "hEmc" ),
-                azmin, azmax, iSpectralIndex, ipedvar,
-                ( TTree* )gDirectory->Get( "fEffAreaH2F" ) ) )
+                 ( TH1D* )gDirectory->Get( "hEmc" ),
+                 azmin, azmax, iSpectralIndex, ipedvar,
+                 ( TTree* )gDirectory->Get( "fEffAreaH2F" ) ) )
         {
             bEffectiveAreasareHistograms = true;
         }
@@ -1674,20 +1674,20 @@ bool VEffectiveAreaCalculator::initializeEffectiveAreasFromHistograms(
             {
                 // Getting MC effective areas
                 vector< float > v_mc = get_irf_vector<float >( nbins_MC,
-                    e0_MC,
-                    eff_MC );
+                                       e0_MC,
+                                       eff_MC );
                 fEffAreaMC_map[i_ID].resize( v_mc.size(), 0. );
                 for( unsigned int it = 0; it < v_mc.size(); it++ )
                 {
                     fEffAreaMC_map[i_ID][it] = v_mc[it];
                 }
                 TH2F* i_hEsysMCRelative2D = get_irf2D_vector( fH2F_EsysMCRelative2D_nbinsx,
-                    fH2F_EsysMCRelative2D_minx,
-                    fH2F_EsysMCRelative2D_maxx,
-                    fH2F_EsysMCRelative2D_nbinsy,
-                    fH2F_EsysMCRelative2D_miny,
-                    fH2F_EsysMCRelative2D_maxy,
-                    fH2F_EsysMCRelative2D_value );
+                                            fH2F_EsysMCRelative2D_minx,
+                                            fH2F_EsysMCRelative2D_maxx,
+                                            fH2F_EsysMCRelative2D_nbinsy,
+                                            fH2F_EsysMCRelative2D_miny,
+                                            fH2F_EsysMCRelative2D_maxy,
+                                            fH2F_EsysMCRelative2D_value );
                 if( i_hEsysMCRelative2D )
                 {
                     fEsysMCRelative2D_map[i_ID] = ( TH2F* )i_hEsysMCRelative2D->Clone();
@@ -3006,10 +3006,10 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                             unsigned int i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                             unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                             i_noise_eff_temp[n] = interpolate_effectiveArea( iSpectralIndex,
-                                fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
-                                fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
-                                fEffArea_map[i_ID_0],
-                                fEffArea_map[i_ID_1], false );
+                                                  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[0]],
+                                                  fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]][i_index_bins[1]],
+                                                  fEffArea_map[i_ID_0],
+                                                  fEffArea_map[i_ID_1], false );
 
                             if( bLikelihoodAnalysis )
                             {
@@ -3048,25 +3048,25 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                         ////////////////////////////////////////////////////////
                     }
                     i_woff_eff_temp[w] = interpolate_effectiveArea( iPedVar,
-                        fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-                        fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-                        i_noise_eff_temp[0],
-                        i_noise_eff_temp[1], false );
+                                         fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
+                                         fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
+                                         i_noise_eff_temp[0],
+                                         i_noise_eff_temp[1], false );
 
                     if( bLikelihoodAnalysis )
                     {
 
                         i_woff_eff_MC_temp[w] = interpolate_effectiveArea( iPedVar,
-                            fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-                            fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-                            i_noise_eff_MC_temp[0],
-                            i_noise_eff_MC_temp[1], false );
+                                                fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
+                                                fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
+                                                i_noise_eff_MC_temp[0],
+                                                i_noise_eff_MC_temp[1], false );
 
 
                         i_woff_Res_temp[w] = interpolate_responseMatrix( iPedVar,
-                            fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-                            fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-                            i_noise_Res_temp[0], i_noise_Res_temp[1], false );
+                                             fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
+                                             fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
+                                             i_noise_Res_temp[0], i_noise_Res_temp[1], false );
                     }
 
                 }
@@ -3082,24 +3082,24 @@ double VEffectiveAreaCalculator::getEffectiveAreasFromHistograms( double erec, d
                 }
             }
             i_ze_eff_temp[i] = interpolate_effectiveArea( woff,
-                fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-                fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-                i_woff_eff_temp[0],
-                i_woff_eff_temp[1], false );
+                               fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
+                               fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
+                               i_woff_eff_temp[0],
+                               i_woff_eff_temp[1], false );
             if( bLikelihoodAnalysis )
             {
 
                 i_ze_eff_MC_temp[i] = interpolate_effectiveArea( woff,
-                    fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-                    fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-                    i_woff_eff_MC_temp[0],
-                    i_woff_eff_MC_temp[1], false );
+                                      fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
+                                      fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
+                                      i_woff_eff_MC_temp[0],
+                                      i_woff_eff_MC_temp[1], false );
 
 
                 i_ze_Res_temp[i] = interpolate_responseMatrix( woff,
-                    fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-                    fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-                    i_woff_Res_temp[0], i_woff_Res_temp[1], false );
+                                   fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
+                                   fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
+                                   i_woff_Res_temp[0], i_woff_Res_temp[1], false );
             }
 
         }
@@ -4031,7 +4031,7 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
             }
 
             vector< unsigned int > i_noise_bins = getUpperLowBins( fEff_Noise[i_ze_bins[i]][i_woff_bins[w]],
-                fEffectiveAreas_meanPedVar );
+                                                  fEffectiveAreas_meanPedVar );
             vector< vector< double > > i_noise_eff_temp( 2, hX );
             for( unsigned int n = 0; n < i_noise_bins.size(); n++ )
             {
@@ -4051,7 +4051,7 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
                     continue;
                 }
                 vector< unsigned int > i_index_bins = getUpperLowBins( fEff_SpectralIndex[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[n]],
-                    fEffectiveAreas_meanIndex );
+                                                      fEffectiveAreas_meanIndex );
                 unsigned int i_ID_0 = i_index_bins[0] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                 unsigned int i_ID_1 = i_index_bins[1] + 100 * ( i_noise_bins[n] + 100 * ( i_woff_bins[w] + 100 * i_ze_bins[i] ) );
                 i_noise_eff_temp[n] = interpolate_effectiveArea(
@@ -4061,14 +4061,14 @@ TGraphErrors* VEffectiveAreaCalculator::getMeanSystematicErrorHistogram()
                                           fEff_EsysMCRelative[i_ID_0], fEff_EsysMCRelative[i_ID_1], false );
             }
             i_woff_eff_temp[w] = interpolate_effectiveArea( fEffectiveAreas_meanPedVar,
-                fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
-                fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
-                i_noise_eff_temp[0], i_noise_eff_temp[1], false );
+                                 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[0]],
+                                 fEff_Noise[i_ze_bins[i]][i_woff_bins[w]][i_noise_bins[1]],
+                                 i_noise_eff_temp[0], i_noise_eff_temp[1], false );
         }
         i_ze_eff_temp[i] = interpolate_effectiveArea( fEffectiveAreas_meanWoff,
-            fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
-            fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
-            i_woff_eff_temp[0], i_woff_eff_temp[1], false );
+                           fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[0]],
+                           fEff_WobbleOffsets[i_ze_bins[i]][i_woff_bins[1]],
+                           i_woff_eff_temp[0], i_woff_eff_temp[1], false );
     }
 
 

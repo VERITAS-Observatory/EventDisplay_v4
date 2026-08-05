@@ -322,7 +322,7 @@ bool VEvndispReconstructionParameter::applyArrayAnalysisCuts( unsigned int iMeth
             if( i < iImageParameter->fImageBorderPixelPosition_y.size() )
             {
                 if( iStarCatalogue->getDistanceToClosestStar( iImageParameter->fImageBorderPixelPosition_x[i],
-                    iImageParameter->fImageBorderPixelPosition_y[i] ) < fRunPara->fMinStarPixelDistance_deg )
+                        iImageParameter->fImageBorderPixelPosition_y[i] ) < fRunPara->fMinStarPixelDistance_deg )
                 {
                     iArrayCut = false;
                     if( fDebug )

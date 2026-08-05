@@ -80,9 +80,9 @@ VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParamete
     {
         iDirRun[i]->cd();
         fHisto.push_back( new VStereoHistograms( i_hsuffix, fRunPara->fSkyMapBinSize, fRunPara->fSkyMapBinSizeUC,
-                fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
-                f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
-                f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
+                          fRunPara->fEnergySpectrumBinSize, fRunPara->fTimeIntervall,
+                          f_t_in_s_min[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff],
+                          f_t_in_s_max[fIsOn ? fRunPara->fRunList[i].fRunOn : fRunPara->fRunList[i].fRunOff], fIsOn ) );
         fHisto.back()->setSkyMapSize( fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
                                       fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax );
         if( fIsOn )
@@ -225,12 +225,12 @@ string  VStereoAnalysis::setRunTimes( CData* iData )
 int VStereoAnalysis::getDataRunNumber() const
 {
     if( !fDataRun )
-{
-    cout << "VStereoAnalysis::getDataRunNumber error: no data tree." << endl;
-}
-else
-{
-    if( fDataRun->GetEntry( 0 ) == -1 )
+    {
+        cout << "VStereoAnalysis::getDataRunNumber error: no data tree." << endl;
+    }
+    else
+    {
+        if( fDataRun->GetEntry( 0 ) == -1 )
         {
             cout << "VStereoAnalysis::getDataRunNumber error: can't seem to access tree." << endl;
         }
@@ -660,9 +660,9 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                     }
                     // get 1 / effective area
                     iEnergyWeighting = fEnergy.getEffectiveArea( iErec, fDataRun->Ze,
-                        iDirectionOffset, iPedVar_temp,
-                        fRunPara->fEnergyReconstructionSpectralIndex, true,
-                        fRunPara->fEffectiveAreaVsEnergyMC );
+                                       iDirectionOffset, iPedVar_temp,
+                                       fRunPara->fEnergyReconstructionSpectralIndex, true,
+                                       fRunPara->fEffectiveAreaVsEnergyMC );
 
                     // fill energy histograms: require a valid effective area value
                     if( iEnergyWeighting > 0. )
@@ -1465,11 +1465,11 @@ void VStereoAnalysis::astro_set_skymap_centershift_from_runparameters( unsigned 
         if( TMath::Abs( fRunPara->fTargetShiftDecJ2000 ) > 1.e-8 || TMath::Abs( fRunPara->fTargetShiftRAJ2000 ) > 1.e-8 )
         {
             fRunPara->fRunList[runlist_iter].fTargetShiftWest = VSkyCoordinatesUtilities::getTargetShiftWest(
-                    fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
-                    fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+                        fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                        fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
             fRunPara->fRunList[runlist_iter].fTargetShiftNorth = -1.*VSkyCoordinatesUtilities::getTargetShiftNorth(
-                    fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
-                    fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
+                        fRunPara->fRunList[runlist_iter].fTargetRAJ2000, fRunPara->fRunList[runlist_iter].fTargetDecJ2000,
+                        fRunPara->fTargetShiftRAJ2000, fRunPara->fTargetShiftDecJ2000 );
 
             fRunPara->fRunList[runlist_iter].fTargetShiftWest  += fRunPara->fRunList[runlist_iter].fSkyMapCentreWest;
             fRunPara->fRunList[runlist_iter].fTargetShiftNorth += fRunPara->fRunList[runlist_iter].fSkyMapCentreNorth;
@@ -1690,11 +1690,11 @@ void VStereoAnalysis::astro_setup_star_cataloge( unsigned int runlist_iter )
     }
 
     fAstro.back()->initStarCatalogue(
-              fRunPara->fStarCatalogue,
-              astro_get_mjd( runlist_iter ),
-              fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
-              fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
-              fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000, fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 );
+        fRunPara->fStarCatalogue,
+        astro_get_mjd( runlist_iter ),
+        fRunPara->fSkyMapSizeXmin, fRunPara->fSkyMapSizeXmax,
+        fRunPara->fSkyMapSizeYmin, fRunPara->fSkyMapSizeYmax,
+        fRunPara->fRunList[runlist_iter].fSkyMapCentreRAJ2000, fRunPara->fRunList[runlist_iter].fSkyMapCentreDecJ2000 );
     VStarCatalogue* iStarCatalogue = fAstro.back()->getStarCatalogue();
     if( !iStarCatalogue )
     {
@@ -1800,8 +1800,8 @@ void VStereoAnalysis::defineAstroSource()
         fAstro.back()->setTelRADec_deg( astro_get_arraypointing( i, false ) );
 
         fAstro.back()->setObservatory(
-                  fRunPara->getObservatory_Longitude_deg(),
-                  fRunPara->getObservatory_Latitude_deg() );
+            fRunPara->getObservatory_Longitude_deg(),
+            fRunPara->getObservatory_Latitude_deg() );
 
         astro_set_exclusionsregions( i );
     }

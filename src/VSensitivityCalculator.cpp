@@ -539,7 +539,7 @@ vector< TGraph* > VSensitivityCalculator::getCrabSpectrum( vector< double > i_fC
         if( bUnit == "PFLUX" || bUnit == "ENERGY" )
         {
             i_fFunCrabFlux = fEnergySpectrumfromLiterature->getEnergySpectrum( fEnergySpectrumfromLiterature_ID,
-                false, TMath::Power( 10., fEnergy_min_Log ), 10000. );
+                             false, TMath::Power( 10., fEnergy_min_Log ), 10000. );
         }
         else if( bUnit == "CU" )
         {
@@ -898,13 +898,13 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         int energy_intX3 = ( int )( energy * 1.e3 );
         // get sensitivity limitations
         fSignificanceLimited[energy_intX3]        = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 1 );
+                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 1 );
         fMinEventsLimited[energy_intX3]           = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 2 );
+                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 2 );
         fMinBackgroundEventsLimited[energy_intX3] = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 3 );
+                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 3 );
         fMinNoBackground[energy_intX3]            = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-            noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 4 );
+                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 4 );
 
         // fill sensitivity graphs
         double f1 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_lowEdge ) );
@@ -1466,7 +1466,7 @@ double VSensitivityCalculator::calculateObservationTimevsFlux( unsigned int iD )
     {
         // take logarithmic steps in flux [log10 CU]
         x =   TMath::Log10( fSourceStrength_min ) + ( TMath::Log10( fSourceStrength_max )
-            - TMath::Log10( fSourceStrength_min ) ) / ( double )fGraphObsvsTime[iD]->GetN() * ( double )i;
+                - TMath::Log10( fSourceStrength_min ) ) / ( double )fGraphObsvsTime[iD]->GetN() * ( double )i;
         // linear flux [CU]
         x =   TMath::Power( 10., x );
 
@@ -1476,7 +1476,7 @@ double VSensitivityCalculator::calculateObservationTimevsFlux( unsigned int iD )
         {
             // log10 hours
             t = TMath::Log10( fObservationTime_min ) + ( TMath::Log10( fObservationTime_max ) -
-                TMath::Log10( fObservationTime_min ) ) / ( double )fObservationTime_steps * ( double )j;
+                    TMath::Log10( fObservationTime_min ) ) / ( double )fObservationTime_steps * ( double )j;
             // log10 hours to min
             t = TMath::Power( 10., t ) * 60.;
 
@@ -2011,11 +2011,11 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
     for( unsigned int i = 0; i < v_flux.size(); i++ )
     {
         v_flux[i].NOn       = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab,
-            *fMC_Data[1], fMC_Data[1]->hResponseMatrix, false, &iMCR,
-            v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
+                              *fMC_Data[1], fMC_Data[1]->hResponseMatrix, false, &iMCR,
+                              v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
         v_flux[i].NOn_error = getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin, i_Crab,
-            *fMC_Data[1], fMC_Data[1]->hResponseMatrix, true, &iMCR,
-            v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
+                              *fMC_Data[1], fMC_Data[1]->hResponseMatrix, true, &iMCR,
+                              v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
     }
 
 
@@ -2058,19 +2058,19 @@ vector< VDifferentialFlux > VSensitivityCalculator::getDifferentialFluxVectorfro
         for( unsigned int i = 0; i < v_flux.size(); i++ )
         {
             v_flux_NOff[( *i_MCData_iterator ).first][i]       =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
-                i_CR, ( *i_MCData_iterator ).second->fSpectralParameterID,
-                fMC_Data[1]->energy,
-                ( *i_MCData_iterator ).second->energy, ( *i_MCData_iterator ).second->effArea,
-                ( *i_MCData_iterator ).second->hResponseMatrix, false, &iMCR,
-                ( *i_MCData_iterator ).second->hWeightedRate,
-                v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
+                    i_CR, ( *i_MCData_iterator ).second->fSpectralParameterID,
+                    fMC_Data[1]->energy,
+                    ( *i_MCData_iterator ).second->energy, ( *i_MCData_iterator ).second->effArea,
+                    ( *i_MCData_iterator ).second->hResponseMatrix, false, &iMCR,
+                    ( *i_MCData_iterator ).second->hWeightedRate,
+                    v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
             v_flux_NOff_error[( *i_MCData_iterator ).first][i] =    getMonteCarlo_Rate( v_flux[i].Energy_lowEdge_bin, v_flux[i].Energy_upEdge_bin,
-                i_CR, ( *i_MCData_iterator ).second->fSpectralParameterID,
-                fMC_Data[1]->energy,
-                ( *i_MCData_iterator ).second->energy, ( *i_MCData_iterator ).second->effArea_error,
-                ( *i_MCData_iterator ).second->hResponseMatrix, true, &iMCR,
-                ( *i_MCData_iterator ).second->hWeightedRate,
-                v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
+                    i_CR, ( *i_MCData_iterator ).second->fSpectralParameterID,
+                    fMC_Data[1]->energy,
+                    ( *i_MCData_iterator ).second->energy, ( *i_MCData_iterator ).second->effArea_error,
+                    ( *i_MCData_iterator ).second->hResponseMatrix, true, &iMCR,
+                    ( *i_MCData_iterator ).second->hWeightedRate,
+                    v_flux[i].Energy_lowEdge, v_flux[i].Energy_upEdge );
 
             //////////////////////////////////////////////////////////////////////////////////////////
             // take care of space angle and theta2 cut normalisation

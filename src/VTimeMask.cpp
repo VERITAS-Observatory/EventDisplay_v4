@@ -688,8 +688,8 @@ void        VTimeMask::getIntervalRates( vector< double >& event_count, vector< 
 
     double count = 0.;
     for( unsigned int t = 0; t < mask.size(); t++ )
-{
-    total += counted.at( t );
+    {
+        total += counted.at( t );
         mean  += t * mask.at( t );
         live  += mask.at( t );
 

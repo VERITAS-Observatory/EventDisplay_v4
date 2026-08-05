@@ -60,7 +60,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut, bool iSignal )
         iTreeVector = iRun->fBackgroundTree;
         iDataTree_reducedName = "data_background";
     }
-    TTree *iDataTree_reduced = 0;
+    TTree* iDataTree_reduced = 0;
     Double_t Ze = 0.;
     Double_t Az = 0.;
     Double_t WobbleN = 0;
@@ -137,7 +137,7 @@ TTree* prepareSelectedEventsTree( VTMVARunData* iRun, TCut iCut, bool iSignal )
                 return 0;
             }
             iTreeVector[i]->Draw( ">>elist", iCut, "entrylist" );
-            TEntryList *elist = ( TEntryList* )gDirectory->Get( "elist" );
+            TEntryList* elist = ( TEntryList* )gDirectory->Get( "elist" );
             if( elist && elist->GetN() > 0 )
             {
                 // select a random subsample
@@ -282,8 +282,8 @@ bool train( VTMVARunData* iRun,
     // prepare trees for training and testing with selected events only
     // this step is necessary to minimize the memory impact for the BDT
     // training
-    TTree *iSignalTree_reduced = 0;
-    TTree *iBackgroundTree_reduced = 0;
+    TTree* iSignalTree_reduced = 0;
+    TTree* iBackgroundTree_reduced = 0;
     if( iRun->fRunOption == "WRITETRAININGEVENTS" )
     {
         iSignalTree_reduced = prepareSelectedEventsTree( iRun, iCutSignal, true );
@@ -307,7 +307,7 @@ bool train( VTMVARunData* iRun,
     {
         cout << "Reading training / testing trees from ";
         cout << iRun->fSelectedEventFileName << endl;
-        TFile *iF = new TFile( iRun->fSelectedEventFileName.c_str() );
+        TFile* iF = new TFile( iRun->fSelectedEventFileName.c_str() );
         if( iF->IsZombie() )
         {
             cout << "Error open file with pre-selected events: ";
@@ -349,10 +349,10 @@ bool train( VTMVARunData* iRun,
     {
         iFactoryOptions += ":AnalysisType=Regression";
     }
-    TMVA::Factory *factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(),
-        iRun->fOutputFile[iEnergyBin][iZenithBin],
-        iFactoryOptions );
-    TMVA::DataLoader *dataloader = new TMVA::DataLoader( "" );
+    TMVA::Factory* factory = new TMVA::Factory( iRun->fOutputFile[iEnergyBin][iZenithBin]->GetTitle(),
+            iRun->fOutputFile[iEnergyBin][iZenithBin],
+            iFactoryOptions );
+    TMVA::DataLoader* dataloader = new TMVA::DataLoader( "" );
     ////////////////////////////
     // train gamma/hadron separation
     if( iTrainGammaHadronSeparation )
@@ -480,7 +480,7 @@ int main( int argc, char* argv[] )
 
     //////////////////////////////////////
     // data object
-    VTMVARunData *fData = new VTMVARunData();
+    VTMVARunData* fData = new VTMVARunData();
     fData->fName = "OO";
 
     //////////////////////////////////////
@@ -565,24 +565,24 @@ int main( int argc, char* argv[] )
 
             // prepare a short root file with the necessary values only
             // write energy & zenith cuts, plus signal and background efficiencies
-            TFile *root_file = fData->fOutputFile[i][j];
+            TFile* root_file = fData->fOutputFile[i][j];
             if( !root_file )
             {
                 cout << "Error finding tvma root file " << endl;
                 continue;
             }
-            TFile *short_root_file = TFile::Open( iTempS.str().c_str(), "RECREATE" );
+            TFile* short_root_file = TFile::Open( iTempS.str().c_str(), "RECREATE" );
             if( !short_root_file->IsZombie() )
             {
-                VTMVARunDataEnergyCut *fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
-                VTMVARunDataZenithCut *fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );
-                TH1D *MVA_BDT_0_effS = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effS" );
-                TH1D *MVA_BDT_0_effB = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effB" );
+                VTMVARunDataEnergyCut* fDataEnergyCut = ( VTMVARunDataEnergyCut* )root_file->Get( "fDataEnergyCut" );
+                VTMVARunDataZenithCut* fDataZenithCut = ( VTMVARunDataZenithCut* )root_file->Get( "fDataZenithCut" );
+                TH1D* MVA_BDT_0_effS = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effS" );
+                TH1D* MVA_BDT_0_effB = ( TH1D* )root_file->Get( "Method_BDT/BDT_0/MVA_BDT_0_effB" );
                 fDataEnergyCut->Write();
                 fDataZenithCut->Write();
-                TDirectory *Method_BDT = short_root_file->mkdir( "Method_BDT" );
+                TDirectory* Method_BDT = short_root_file->mkdir( "Method_BDT" );
                 Method_BDT->cd();
-                TDirectory *BDT_0 = Method_BDT->mkdir( "BDT_0" );
+                TDirectory* BDT_0 = Method_BDT->mkdir( "BDT_0" );
                 BDT_0->cd();
                 MVA_BDT_0_effS->Write();
                 MVA_BDT_0_effB->Write();

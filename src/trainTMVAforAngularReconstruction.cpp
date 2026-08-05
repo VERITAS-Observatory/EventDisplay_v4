@@ -154,7 +154,7 @@ bool trainTMVA( string iOutputDir, float iTrainTest,
 
     // tmva regression
     TMVA::Factory* factory = new TMVA::Factory( iTargetML.c_str(), i_tmva,
-        "V:!DrawProgressBar:!Color:!Silent:AnalysisType=Regression:VerboseLevel=Debug:Correlations=True" );
+            "V:!DrawProgressBar:!Color:!Silent:AnalysisType=Regression:VerboseLevel=Debug:Correlations=True" );
     factory->SetVerbose( true );
     TMVA::DataLoader* dataloader = new TMVA::DataLoader( "" );
 
@@ -655,7 +655,7 @@ bool writeTrainingFile( const string iInputFile, ULong64_t iTelType,
         pair< float, float> i_mean_array_pointing = getArrayPointing( &i_showerpars );
 
         EmissionHeight = fEmissionHeightCalculator->getEmissionHeight( fEM_cen_x, fEM_cen_y, fEM_size,
-            i_mean_array_pointing.first, i_mean_array_pointing.second );
+                         i_mean_array_pointing.first, i_mean_array_pointing.second );
 
         i_SR.reconstruct_direction(
             fEM_TelX.size(),

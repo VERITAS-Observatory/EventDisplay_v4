@@ -62,7 +62,7 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 
         //Set up the accumulator array for a given telescope
         fAccumulatorArray.push_back( initAccumulatorArray( fRMinDpmt[iTelescopeIndex], fRMaxDpmt[iTelescopeIndex],
-                fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
+                                     fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
 
         //Print this when the accumulator array is initialized.
         //cout << "Accumulator array for telescope " << iTelescopeIndex + 1 << " initialized." << endl;
@@ -72,7 +72,7 @@ VHoughTransform::VHoughTransform( VDetectorGeometry* fDetectorGeo )
 
         //Set up the lookup table for a given telescope
         fHTLookupTableTree.push_back( initLookupTable( fRMinDpmt[iTelescopeIndex], fRMaxDpmt[iTelescopeIndex],
-                fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
+                                      fStepsPerPMTDiameter[iTelescopeIndex], iTelescopeIndex ) );
 
         //Print this when the lookup table is initialized
         //cout << "Lookup table for telescope " << iTelescopeIndex + 1 << " initialized." << endl;

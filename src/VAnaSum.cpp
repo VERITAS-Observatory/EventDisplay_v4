@@ -557,7 +557,7 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 
     // normalization at target position
     double i_norm_alpha = fStereoOff->getAlphaNorm()->GetBinContent( fStereoOff->getAlphaNorm()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
-        fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+                          fStereoOff->getAlphaNorm()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 
     // on-off for 1D histograms
     fstereo_onoff->doOnOffforParameterHistograms( fStereoOn->getParameterHistograms(), fStereoOff->getParameterHistograms(), i_norm_alpha, ( onrun == -1 ) );
@@ -578,10 +578,10 @@ void VAnaSum::doStereoAnalysis( int icounter, int onrun, int offrun, TDirectory*
 
     // number of on events
     double i_nevts_on = fStereoOn->getStereoSkyMap()->GetBinContent( fStereoOn->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
-        fStereoOn->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+                        fStereoOn->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
     // number of off events
     double i_nevts_off = fStereoOff->getStereoSkyMap()->GetBinContent( fStereoOff->getStereoSkyMap()->GetXaxis()->FindBin( -1.*fRunPara->fTargetShiftWest ),
-        fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
+                         fStereoOff->getStereoSkyMap()->GetYaxis()->FindBin( -1.*fRunPara->fTargetShiftNorth ) );
 
     double i_sig = VStatistics::calcSignificance( i_nevts_on, i_nevts_off, i_norm_alpha );
     double i_rate = 0.;

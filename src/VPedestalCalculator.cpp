@@ -227,7 +227,7 @@ void VPedestalCalculator::fillTimeSlice( unsigned int telID )
                 //	      v_temp_pedvar[p][w]     = sqrt( 1./(fpedcal_n[telID][p][w]-1.) * ( fpedcal_mean2[telID][p][w] - fpedcal_mean[telID][p][w]*fpedcal_mean[telID][p][w]/fpedcal_n[telID][p][w] ) );
                 v_temp_pedvar[p][w]     = sqrt( 1. / ( fpedcal_n[telID][p][w] )
                                                 * TMath::Abs( fpedcal_mean2[telID][p][w]
-                                                    - fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
+                                                        - fpedcal_mean[telID][p][w] * fpedcal_mean[telID][p][w] / fpedcal_n[telID][p][w] ) );
                 if( fpedcal_histo[telID][p][w]->GetEntries() > 0 )
                 {
                     fpedcal_histo[telID][p][w]->GetQuantiles( 3, yq, xq );
