@@ -9,7 +9,7 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
-## [v492.0-rc6](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0-rc6) - 2026-08-05
+## [v492.0-rc7](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0-rc7) - 2026-08-05
 
 ### Bugfixes
 
