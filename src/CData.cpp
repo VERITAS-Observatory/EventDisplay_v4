@@ -68,6 +68,10 @@ Int_t CData::GetEntry( Long64_t entry )
     }
 
     int a = fChain->GetEntry( entry );
+    if( a <= 0 )
+    {
+        return a;
+    }
     if( fStereoFriendTree )
     {
         if( fStereoFriendTree->GetEntry( entry ) <= 0 )

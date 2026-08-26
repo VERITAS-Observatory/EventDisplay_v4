@@ -1992,7 +1992,7 @@ CData* VStereoAnalysis::getDataFromFile( int i_runNumber )
             iFileName,
             ( fRunPara->fEnergyReconstructionMethod == 2 || fRunPara->fDirectionReconstructionMethod == 2 )
             ? fRunPara->fXGB_stereo_file_suffix : "",
-            ""
+            ""  // GH XGB tree loaded later, after analysis type is known from cut file
         );
         // read current (major) epoch from data file
         VEvndispRunParameter* i_runPara = ( VEvndispRunParameter* )fDataFile->Get( "runparameterV2" );
