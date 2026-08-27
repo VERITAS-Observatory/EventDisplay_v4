@@ -265,6 +265,8 @@ class CData
         float           Dir_Xoff;                 //!
         float           Dir_Yoff;                 //!
         float           Dir_Erec;                 //!
+        Int_t           Dir_runNumber;            //!
+        Int_t           Dir_eventNumber;          //!
         TTree*          fGHFriendTree;                 //!
         float           GH_Gamma_Prediction;      //!
         UChar_t         GH_Is_Gamma;               //!

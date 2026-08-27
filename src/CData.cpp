@@ -68,9 +68,24 @@ Int_t CData::GetEntry( Long64_t entry )
     }
 
     int a = fChain->GetEntry( entry );
+    if( a <= 0 )
+    {
+        return a;
+    }
     if( fStereoFriendTree )
     {
-        fStereoFriendTree->GetEntry( entry );
+        if( fStereoFriendTree->GetEntry( entry ) <= 0 )
+        {
+            cout << "CData error: cannot read XGB stereo friend entry " << entry << endl;
+            exit( EXIT_FAILURE );
+        }
+        if( Dir_runNumber != runNumber || Dir_eventNumber != eventNumber )
+        {
+            cout << "CData error: XGB stereo friend event mismatch at entry " << entry
+                 << " (data run/event " << runNumber << "/" << eventNumber
+                 << ", friend run/event " << Dir_runNumber << "/" << Dir_eventNumber << ")" << endl;
+            exit( EXIT_FAILURE );
+        }
     }
     if( fGHFriendTree )
     {
@@ -1115,15 +1130,31 @@ void CData::initialize_xgb_tree()
 {
     if( fStereoFriendTree )
     {
+        if( fStereoFriendTree->GetEntries() != fChain->GetEntries() )
+        {
+            cout << "CData error: XGB stereo friend tree has " << fStereoFriendTree->GetEntries()
+                 << " entries, but data tree has " << fChain->GetEntries() << endl;
+            exit( EXIT_FAILURE );
+        }
+        if( !fStereoFriendTree->GetBranch( "runNumber" ) || !fStereoFriendTree->GetBranch( "eventNumber" ) )
+        {
+            cout << "CData error: XGB stereo friend tree is missing runNumber and/or eventNumber "
+                 << "integrity branches; regenerate the sidecar" << endl;
+            exit( EXIT_FAILURE );
+        }
         fStereoFriendTree->SetBranchAddress( "Dir_Xoff", &Dir_Xoff );
         fStereoFriendTree->SetBranchAddress( "Dir_Yoff", &Dir_Yoff );
         fStereoFriendTree->SetBranchAddress( "Dir_Erec", &Dir_Erec );
+        fStereoFriendTree->SetBranchAddress( "runNumber", &Dir_runNumber );
+        fStereoFriendTree->SetBranchAddress( "eventNumber", &Dir_eventNumber );
     }
     else
     {
         Dir_Xoff = -9999.;
         Dir_Yoff = -9999.;
         Dir_Erec = -9999.;
+        Dir_runNumber = -1;
+        Dir_eventNumber = -1;
     }
     if( fGHFriendTree )
     {
