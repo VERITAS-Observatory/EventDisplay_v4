@@ -354,7 +354,8 @@ void VArrayAnalyzer::generateReducedPointingTreeData()
     int    iMJD  = TMath::Nint( MJDStart );
     double iTime = TimeStart ;
     int    timeDur = 0 ;
-    while( iMJD <= TMath::Nint( MJDStopp )  &&  iTime < TimeStopp )
+    while( iMJD < TMath::Nint( MJDStopp ) ||
+            ( iMJD == TMath::Nint( MJDStopp ) && iTime < TimeStopp ) )
     {
         // loop over run duration, 1 loop per second
         iTime += 1.0 ;
