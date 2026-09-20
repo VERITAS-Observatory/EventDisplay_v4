@@ -28,7 +28,7 @@ cd sofa
 
 # get sofa package from the web page and install
 SOFAD="20231011"
-SOFA="sofa_c-${SOFAD}tar.gz"
+SOFA="sofa_c-${SOFAD}.tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
 else
@@ -39,7 +39,7 @@ then
     echo "error in downloading sofa package"
     exit
 fi
-tar -xvzf ${SOFA}
+tar -xzf ${SOFA}
 rm -f ${SOFA}
 
 ##########################
