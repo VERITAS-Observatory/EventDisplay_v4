@@ -2,6 +2,7 @@ ARG ROOT_VERSION=6.30.02-alma9
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
+ARG NUM_CORES=4
 # VBF
 ADD https://github.com/VERITAS-Observatory/VBF.git#$VBF_VERSION-c++17 /workdir/VBF
 WORKDIR /workdir/
@@ -20,16 +21,16 @@ RUN BUILD_BRANCH=$(echo ${BUILD_BRANCH} | sed 's#refs/tags/##') && \
 ADD https://www.iausofa.org/s/sofa_c-20231011tar.gz ${SOFASYS}/sofa.tar.gz
 
 RUN cd ${EVNDISPSYS} \
-    && ./install_sofa.sh && make VTS
+    && ./install_sofa.sh && make -j"${NUM_CORES}" VTS
  
 FROM rootproject/root:${ROOT_VERSION}
 WORKDIR /opt/
 COPY --from=build /opt/VBF /opt/VBF
 COPY --from=build /opt/EventDisplay_v4 /opt/EventDisplay_v4
 
-LABEL maintainer.name="Eventdisplay Team"
-LABEL maintainer.email="gernot.maier@desy.de"
- 
+LABEL maintainer.name="Eventdisplay Team" \
+    maintainer.email="gernot.maier@desy.de"
+
 ENV EVNDISPSYS /opt/EventDisplay_v4
 ENV VBFSYS /opt/VBF
 ENV LD_LIBRARY_PATH "${VBFSYS}/lib/:${LD_LIBRARY_PATH}"
