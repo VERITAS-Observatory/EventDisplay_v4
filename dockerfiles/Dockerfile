@@ -6,9 +6,9 @@ ARG VBF_DOWNLOAD_TOKEN
 ARG SOFA_DOWNLOAD_TOKEN
 
 # VBF
-Add https://github.com/VERITAS-Observatory/VBF/archive/refs/tags/$VBF_VERSION-c++17.tar.gz
+Add https://github.com/VERITAS-Observatory/VBF/archive/refs/tags/$VBF_VERSION-c++17.tar.gz VBF.tar.gz
 WORKDIR /workdir/
-RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION-c-17.tar.gz -C VBF --strip-components=1 && \
+RUN mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1 && \
     cd VBF && \
     ./configure --prefix=/opt/VBF && \
     make && make install && make clean
