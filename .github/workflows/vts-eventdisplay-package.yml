@@ -57,8 +57,8 @@ jobs:
           context: .
           build-args: |
             BUILD_BRANCH=${{ env.BUILD_BRANCH }}
-            VBF_DOWNLOAD_TOKEN=${{ secrets.VBFCPP17 }}
-            SOFA_DOWNLOAD_TOKEN=${{ secrets.SOFA }}
+          secrets: |
+            HTTP_AUTH_TOKEN_github.com=${{ secrets.VBF_GITHUB_TOKEN }}
           push: ${{ github.event_name != 'pull_request' }}
           file: ./EventDisplay_v4/dockerfiles/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}

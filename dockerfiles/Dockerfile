@@ -2,9 +2,6 @@ ARG ROOT_VERSION=6.30.02-alma9
 FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
-ARG VBF_DOWNLOAD_TOKEN
-ARG SOFA_DOWNLOAD_TOKEN
-
 # VBF
 Add https://github.com/VERITAS-Observatory/VBF/archive/refs/tags/$VBF_VERSION-c++17.tar.gz VBF.tar.gz
 WORKDIR /workdir/
