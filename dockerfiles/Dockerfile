@@ -6,9 +6,9 @@ ARG VBF_DOWNLOAD_TOKEN
 ARG SOFA_DOWNLOAD_TOKEN
 
 # VBF
-ADD https://syncandshare.desy.de/index.php/s/${VBF_DOWNLOAD_TOKEN}/download /workdir/VBF-$VBF_VERSION.tar.gz
+Add https://github.com/VERITAS-Observatory/VBF/archive/refs/tags/$VBF_VERSION-c++17.tar.gz
 WORKDIR /workdir/
-RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION.tar.gz -C VBF --strip-components=1 && \
+RUN mkdir VBF && tar -xzf VBF-$VBF_VERSION-c-17.tar.gz -C VBF --strip-components=1 && \
     cd VBF && \
     ./configure --prefix=/opt/VBF && \
     make && make install && make clean
@@ -21,7 +21,7 @@ ENV LD_LIBRARY_PATH "${EVNDISPSYS}/obj:${EVNDISPSYS}/lib:${ROOTSYS}/lib:${VBFSYS
 WORKDIR /opt/
 RUN BUILD_BRANCH=$(echo ${BUILD_BRANCH} | sed 's#refs/tags/##') && \
     git clone -b ${BUILD_BRANCH} https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
-ADD https://syncandshare.desy.de/index.php/s/${SOFA_DOWNLOAD_TOKEN}/download  ${SOFASYS}/sofa.tar.gz
+ADD https://www.iausofa.org/s/sofa_c-20231011tar.gz ${SOFASYS}/sofa.tar.gz
 
 RUN cd ${EVNDISPSYS} \
     && ./install_sofa.sh && make VTS
