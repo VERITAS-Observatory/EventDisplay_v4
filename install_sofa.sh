@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # install the sofa package into the $EVNDISPSYS directory
 #
 # see https://www.iausofa.org for a description
@@ -14,7 +14,7 @@ echo "Installation of sofa into $EVNDISPSYS "
 CURDIR=`pwd`
 cd "$EVNDISPSYS"
 
-echo "Checking for existing sofa installation " 
+echo "Checking for existing sofa installation "
 
 if [ -d "sofa" ] && [ -d "sofa/lib" ]
 then
