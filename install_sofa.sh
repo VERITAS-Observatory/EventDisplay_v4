@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # install the sofa package into the $EVNDISPSYS directory
 #
 # see https://www.iausofa.org for a description
@@ -14,7 +14,7 @@ echo "Installation of sofa into $EVNDISPSYS "
 CURDIR=`pwd`
 cd "$EVNDISPSYS"
 
-echo "Checking for existing sofa installation " 
+echo "Checking for existing sofa installation "
 
 if [ -d "sofa" ] && [ -d "sofa/lib" ]
 then
@@ -27,15 +27,18 @@ mkdir -p sofa
 cd sofa
 
 # get sofa package from the web page and install
-SOFAD="20210512"
+SOFAD="20231011"
 SOFA="sofa_c-${SOFAD}.tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
 elif [[ $DOWNL == "CI" ]]; then
-    wget https://syncandshare.desy.de/index.php/s/jr9NrbWFR5MLaDf/download
-    mv -f download ${SOFA}
+    wget --no-check-certificate \
+        https://www.iausofa.org/s/sofa_c-20231011tar.gz \
+        -O ${SOFA}
 else
-    wget --no-check-certificate https://www.iausofa.org/2021_0512_C/${SOFA}
+    wget --no-check-certificate \
+        https://www.iausofa.org/s/sofa_c-20231011tar.gz \
+        -O ${SOFA}
 fi
 if [ ! -e ${SOFA} ]
 then
