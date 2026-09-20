@@ -58,8 +58,7 @@ jobs:
           build-args: |
             BUILD_BRANCH=${{ env.BUILD_BRANCH }}
           secrets: |
-            HTTP_AUTH_TOKEN_github.com=${{ secrets.VBF_GITHUB_TOKEN }}
-            HTTP_AUTH_TOKEN_codeload.github.com=${{ secrets.VBF_GITHUB_TOKEN }}
+            GIT_AUTH_TOKEN.github.com=${{ secrets.VBF_GITHUB_TOKEN }}
           push: ${{ github.event_name != 'pull_request' }}
           file: ./EventDisplay_v4/dockerfiles/Dockerfile
           tags: ${{ steps.meta.outputs.tags }}

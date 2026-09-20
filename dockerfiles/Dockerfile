@@ -3,10 +3,9 @@ FROM rootproject/root:${ROOT_VERSION} AS build
 ARG VBF_VERSION=0.3.4
 ARG BUILD_BRANCH=main
 # VBF
-Add https://github.com/VERITAS-Observatory/VBF/archive/refs/tags/$VBF_VERSION-c++17.tar.gz VBF.tar.gz
+ADD https://github.com/VERITAS-Observatory/VBF.git#$VBF_VERSION-c++17 /workdir/VBF
 WORKDIR /workdir/
-RUN mkdir VBF && tar -xzf VBF.tar.gz -C VBF --strip-components=1 && \
-    cd VBF && \
+RUN cd VBF && \
     ./configure --prefix=/opt/VBF && \
     make && make install && make clean
 ENV VBFSYS /opt/VBF
