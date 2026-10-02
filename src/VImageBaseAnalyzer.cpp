@@ -335,7 +335,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
 				}
 				fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
 				// calculate t0
-				if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
+				if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 100 )
 				{
 					crateTZero = fTraceHandler->getFADCTiming( 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
 					if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] )
@@ -734,7 +734,7 @@ void VImageBaseAnalyzer::calcTZerosSums( int iFirstSum, int iLastSum, unsigned i
 
 /*!
 
-    apply relative gain corretion
+    apply relative gain correction
 
 */
 void VImageBaseAnalyzer::gainCorrect()
@@ -1080,7 +1080,7 @@ void VImageBaseAnalyzer::findDeadChans( bool iLowGain, bool iFirst )
 		do
 		{
 			iPix = getAnaData()->getRandomDeadChannel();
-			// check if this one is alread dead
+            // check if this one is already dead
 			if( !( getDead( iLowGain ).at( iPix ) ) )
 			{
 				setDead( iPix, 10, iLowGain );
@@ -1514,7 +1514,7 @@ unsigned int VImageBaseAnalyzer::getDynamicSummationWindow( unsigned int i_chann
 
 /*
 
-   make sure that integration window position is insided the readout window
+   make sure that integration window position is inside the readout window
 
 */
 int VImageBaseAnalyzer::getFADCTraceIntegrationPosition( int iPos )
@@ -1572,4 +1572,3 @@ void VImageBaseAnalyzer::initializeTrace( bool iMakingPeds, unsigned int i_chann
 	}
 	
 }
-
