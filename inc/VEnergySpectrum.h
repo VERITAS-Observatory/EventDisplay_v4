@@ -106,7 +106,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
 
         void   addValueToHistogram( TH1* h, double iTObs, double iEThreshold, bool bLinearX = false );
         void   addValueToHistogram( TH1* h, TGraph* g, double iTObs, double iEThreshold, bool bLinearX = false );
-        void   addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool bLinearX );
+        void   addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool bLinearX, double weight = 1. );
         void   divideEnergySpectrumbydE( TH1* h, bool blin = false );
         int    getRebinningGrouping( TH1* h, double iNewBinWidth );
         bool   openAsciiFile( string iFile );
@@ -118,6 +118,7 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         // histograms
         TH1D* hErecCountsOn;
         TH1D* hErecCountsOff;
+        TH1D* hErecBackground; // sum of per-run alpha * OFF after energy thresholds
         TH1D* hErecTotalTime;
         TH1D* hErecTotalTimeDeadTimeCorrected;
         TH1D* hEffArea;
@@ -313,6 +314,6 @@ class VEnergySpectrum : public VAnalysisUtilities, public VPlotUtilities
         bool writeSpectralPointsToCSVFile( string iOFileName, TGraphAsymmErrors* iDiffFlux = 0 );
 
 
-        ClassDef( VEnergySpectrum, 17 );
+        ClassDef( VEnergySpectrum, 18 );
 };
 #endif
