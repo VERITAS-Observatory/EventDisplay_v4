@@ -1,7 +1,7 @@
 ARG ROOT_VERSION=6.38.00-ubuntu25.10
 ARG EVENTDISPLAY_ML_VERSION=3.2.0
 FROM rootproject/root:${ROOT_VERSION} AS build
-ARG VBF_VERSION=0.3.4
+ARG VBF_VERSION=0.3.4-1
 ARG BUILD_BRANCH=main
 ARG NUM_CORES=4
 
@@ -27,7 +27,7 @@ ENV VBFSYS=/opt/VBF \
 WORKDIR /opt/
 RUN BUILD_BRANCH="$(echo "${BUILD_BRANCH}" | sed 's#refs/tags/##')" && \
     git clone -b "${BUILD_BRANCH}" https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
-ADD https://www.iausofa.org/s/sofa_c-20231011tar.gz ${SOFASYS}/sofa.tar.gz
+ADD https://www.iausofa.org/c/sofa_c-20231011.tar.gz ${SOFASYS}/sofa.tar.gz
 
 WORKDIR /opt/EventDisplay_v4
 RUN ./install_sofa.sh && make -j"${NUM_CORES}" VTS

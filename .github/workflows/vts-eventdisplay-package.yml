@@ -25,6 +25,10 @@ env:
 
 jobs:
   build-vts-eventdisplay-image:
+    # VBF is fetched from a private repository with a repository secret. Fork
+    # pull requests cannot access that secret, so defer this image build for
+    # those events instead of failing the pull request workflow.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
