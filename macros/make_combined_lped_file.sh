@@ -1,54 +1,43 @@
-#! /bin/zsh
-
-if [ ! -n "$1" ]
-    then
-    echo "Usage: make_combined_lped_file.sh <list> [calib dir]"
-    exit
+#!/bin/zsh
+# Historical channel exclusions below are preserved. Run IDs encode run*100+subrun.
+if [[ $# < 1 || ! -f $1 ]]; then
+    echo "Usage: $0 <run/subrun list> [calib dir]" >&2
+    exit 1
+fi
+list=$(realpath "$1") || exit 1
+dir=$(realpath "${2:-$VERITAS_EVNDISP_AUX_DIR/Calibration}") || exit 1
+script_dir=$(dirname "$(realpath "$0")")
+output="$PWD/LowGainPedestals.lped"
+output_tmp=$(mktemp "$PWD/.LowGainPedestals.XXXXXX") || exit 1
+scratch=$(mktemp -d "${TMPDIR:-/tmp}/lped-XXXXXX") || exit 1
+trap 'rm -rf -- "$scratch"; rm -f -- "$output_tmp"' EXIT
+mkdir -p "$dir/lpedfiles" || exit 1
+names=()
+while read -r run rest || [[ -n $run ]]; do
+    [[ -z $run || $run == \#* ]] && continue
+    [[ $run =~ ^[0-9]+$ ]] || exit 1
+    if [[ ! -s "$dir/lpedfiles/$run.lped" ]]; then
+        "$script_dir/mutate_lped.pl" "$run" "$dir" || exit 1
     fi
-
-    list = $1
-
-           dir = $ {2 - $VERITAS_EVNDISP_AUX_DIR / Calibration}
-
-                 echo $list
-                 echo $dir
-
-                 if [ ! -d $dir / lpedfiles ]
-                     then
-                     mkdir $dir / lpedfiles
-                     fi
-
-                     if [ -e temp.lped ]
-                         then
-                         rm temp.lped
-                         fi
-# touch temp.lped
-                         for run in `cat $list`
-                         do
-                             if [ ! -e $dir / lpedfiles / $run.lped ]
-                                     then
-                                     mutate_lped.pl $run $dir
-                                     fi
-# cat $dir/lpedfiles/$run.lped >> temp.lped
-                                     names += ($dir / lpedfiles / $run.lped )
-# echo $names
-                                              done
-                                              echo "mutated"
-# cat temp.lped | sort -n temp.lped
-                                              sort - n - o temp.lped $names
-                                              echo "sorted"
+    [[ -s "$dir/lpedfiles/$run.lped" ]] || exit 1
+    names+=("$dir/lpedfiles/$run.lped")
+done < "$list"
+((${#names[@]})) || exit 1
+cd "$scratch" || exit 1
+sort -n -o temp.lped "${names[@]}" || exit 1
+sed -i -e 's/\t/ /g' temp.lped || exit 1
 # swap modules 18 and 26 in that one run
 
-                                              sed - i - e "s/\t/ /g" temp.lped
+                                              sed -i -e "s/\t/ /g" temp.lped || exit 1
                                               echo "spaced"
 
-                                              for(( i = 0; i < 10; i++ ) )
+                                              for (( i = 0; i < 10; i++ ))
                                                   do
-                                                      sed - i - e "s/26 $i 6947576 3 2/18XX $i 6947576 3 2/" temp.lped
-                                                      sed - i - e "s/18 $i 6947576 3 2/26XX $i 6947576 3 2/" temp.lped
+                                                      sed -i -e "s/26 $i 6947576 3 2/18XX $i 6947576 3 2/" temp.lped || exit 1
+                                                      sed -i -e "s/18 $i 6947576 3 2/26XX $i 6947576 3 2/" temp.lped || exit 1
                                                       done
 
-                                                      sed - i - e "s/XX//" temp.lped
+                                                      sed -i -e "s/XX//" temp.lped || exit 1
 
                                                       echo "swapped"
 # remove some runs.
@@ -56,15 +45,15 @@ if [ ! -n "$1" ]
 # 5769394, 5811314, 5880607 T2: Pulse very late -> not reliable for lpeds
 # 5423738, 5423941, 5508384, 5625859, 5625860 -> 64 sample readout
 
-                                                      sed - i - e "/7083132 3/d" - e "/5769394 1/d" - e "/5811314 1/d" - e "/5880607 1/d" temp.lped
-                                                      sed - i - e "/5423738/d" - e "/5423941/d" - e "/5508384/d" - e "/5625859/d" - e "/5625860/d" temp.lped
+                                                      sed -i -e "/7083132 3/d" -e "/5769394 1/d" -e "/5811314 1/d" -e "/5880607 1/d" temp.lped || exit 1
+                                                      sed -i -e "/5423738/d" -e "/5423941/d" -e "/5508384/d" -e "/5625859/d" -e "/5625860/d" temp.lped || exit 1
                                                       echo "removed runs"
 # remove bogus lped of L2 channels
 # T3, 443 became parasitic L2 channel after 52186
-                                                      sed - i - e "/^190 3 [56789]...... 2 443/d" temp.lped
+                                                      sed -i -e "/^190 3 [56789]...... 2 443/d" temp.lped || exit 1
 # T1 channels 110/255/404, T2, c173, T3 c 37/159/319, T4 c 99/259 became L2 channel after 36254
-                                                      sed - i - e "/^142 7 [56789]...... 2 37/d" temp.lped
-                                                      sed - i - e "/^63 3 [56789]...... 1 173/d" temp.lped
+                                                      sed -i -e "/^142 7 [56789]...... 2 37/d" temp.lped || exit 1
+                                                      sed -i -e "/^63 3 [56789]...... 1 173/d" temp.lped || exit 1
                                                       echo "removed L2"
 # remove channels that have no pulse in LG
 # what about  "203 9", "89 3", "192 3", "24 3", "38 8"
@@ -94,7 +83,8 @@ if [ ! -n "$1" ]
                                 {
                                     print $0
                                 }
-}' temp.lped > LowGainPedestals.lped
+}' temp.lped > "$output_tmp" || exit 1
+mv -f -- "$output_tmp" "$output" || exit 1
 echo "awked"
 
 exit

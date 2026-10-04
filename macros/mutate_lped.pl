@@ -23,7 +23,7 @@ use DBI;
 # CONFIG VARIABLES
 my $platform = 'mysql';
 my $database = 'VERITAS';
-my $host = 'remus.ucsc.edu';
+my $host = $ENV{VERITAS_DB_HOST} or die "Set VERITAS_DB_HOST for the calibration database\n";
 my $user = 'readonly';
 my $pw = '';
 #DATA SOURCE NAME
@@ -34,7 +34,9 @@ my $connect = DBI->connect($dsn, $user, $pw ) || die "Could not connect to datab
 
 # first: get the date
 my $date;
-my $run = substr($lpedrun, 0, 5 );
+# lpedrun encodes observation run followed by two subrun digits.
+$lpedrun =~ /^(\d{5,})\d{2}$/ or die "Invalid run/subrun ID: $lpedrun\n";
+my $run = $1;
 my $statement = qq{select db_start_time from tblRun_Info where run_id = $run };
 
 my $query_handle = $connect->prepare($statement );
