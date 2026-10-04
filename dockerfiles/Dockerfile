@@ -27,7 +27,7 @@ ENV VBFSYS=/opt/VBF \
 WORKDIR /opt/
 RUN BUILD_BRANCH="$(echo "${BUILD_BRANCH}" | sed 's#refs/tags/##')" && \
     git clone -b "${BUILD_BRANCH}" https://github.com/VERITAS-Observatory/EventDisplay_v4.git --depth 1
-ADD https://www.iausofa.org/c/sofa_c-20231011.tar.gz ${SOFASYS}/sofa.tar.gz
+ADD https://www.iausofa.org/s/sofa_c-20231011tar.gz ${SOFASYS}/sofa.tar.gz
 
 WORKDIR /opt/EventDisplay_v4
 RUN ./install_sofa.sh && make -j"${NUM_CORES}" VTS
