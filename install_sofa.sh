@@ -32,7 +32,7 @@ SOFA="sofa_c-${SOFAD}.tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
 else
-    wget --no-check-certificate https://www.iausofa.org/c/${SOFA}
+    wget --no-check-certificate https://www.iausofa.org/s/${SOFA}
 fi
 if [ ! -e ${SOFA} ]
 then
