@@ -2290,8 +2290,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     fDL3EventTree_eventNumber    = c->eventNumber;
     fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
     fDL3EventTree_MJD            = c->MJD;
-    fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coordinates (deg)
-    fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coordinates (deg)
+    fDL3EventTree_Xoff           = c->get_Xoff( fRunPara->fDirectionReconstructionMethod );         // Gamma Point-Of-Origin, in camera coordinates (deg)
+    fDL3EventTree_Yoff           = c->get_Yoff( fRunPara->fDirectionReconstructionMethod );         // Gamma Point-Of-Origin, in camera coordinates (deg)
     fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
     fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
     if( fCuts )
@@ -2314,7 +2314,7 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     fDL3EventTree_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
     if( fDL3_Acceptance )
     {
-        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( c->Xoff, c->Yoff );
+        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( fDL3EventTree_Xoff, fDL3EventTree_Yoff );
     }
     else
     {
