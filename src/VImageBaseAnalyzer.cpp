@@ -335,7 +335,7 @@ void VImageBaseAnalyzer::FADCStopCorrect()
                 }
                 fTraceHandler->setTraceIntegrationmethod( getTraceIntegrationMethod() );
                 // calculate t0
-                if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 300 )
+                if( fTraceHandler->getTraceSum( 0, getNSamples(), false ) > 100 )
                 {
                     crateTZero = fTraceHandler->getFADCTiming( 0, getNSamples() )[getRunParameter()->fpulsetiming_tzero_index];
                     if( i_channelHitID < getHiLo().size() && getHiLo()[i_channelHitID] )
