@@ -5,6 +5,8 @@
 
 #include "VStereoAnalysis.h"
 
+#include <limits>
+
 VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParameter* irunpara, vector< TDirectory* > iDirRun,
                                   TDirectory* iDirTot, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly )
 {
@@ -702,10 +704,12 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                 for( unsigned int t = 0; t < fRunPara->fRunList[fHisCounter].fTelToAnalyze.size(); t++ )
                 {
                     // for some runs LTrig is not filled!
-                    if( ( ( 1ULL << fRunPara->fRunList[fHisCounter].fTelToAnalyze[t] ) & fDataRun->LTrig ) || ( fDataRun->LTrig == 0 ) )
+                    unsigned int iTelID = fRunPara->fRunList[fHisCounter].fTelToAnalyze[t];
+                    if( fDataRun->LTrig == 0 || ( iTelID < static_cast< unsigned int >( std::numeric_limits<ULong64_t>::digits )
+                                                  && ( ( 1ULL << iTelID ) & fDataRun->LTrig ) ) )
                     {
-                        fMeanAzimuth  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuth, fDataRun->TelAzimuth[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]] );
-                        fMeanElevation += fDataRun->TelElevation[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]];
+                        fMeanAzimuth  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuth, fDataRun->TelAzimuth[iTelID] );
+                        fMeanElevation += fDataRun->TelElevation[iTelID];
                         fNMeanElevation++;
                         break;
                     }
