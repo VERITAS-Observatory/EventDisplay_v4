@@ -89,7 +89,12 @@ Int_t CData::GetEntry( Long64_t entry )
     }
     if( fGHFriendTree )
     {
-        fGHFriendTree->GetEntry( entry );
+        if( fGHFriendTree->GetEntry( entry ) <= 0
+            || GH_runNumber != runNumber || GH_eventNumber != eventNumber )
+        {
+            cout << "CData error: unreadable or mismatched classification friend entry " << entry << endl;
+            exit( EXIT_FAILURE );
+        }
     }
 
     if( fTelescopeCombination > 0 && fTelescopeCombination != 15 )
@@ -1158,8 +1163,19 @@ void CData::initialize_xgb_tree()
     }
     if( fGHFriendTree )
     {
-        fGHFriendTree->SetBranchAddress( "Gamma_Prediction", &GH_Gamma_Prediction );
-        fGHFriendTree->SetBranchAddress( "Is_Gamma_70", &GH_Is_Gamma );
+        if( fGHFriendTree->GetEntries() != fChain->GetEntries()
+            || !fGHFriendTree->GetBranch( "runNumber" )
+            || !fGHFriendTree->GetBranch( "eventNumber" )
+            || !fGHFriendTree->GetBranch( "Gamma_Prediction" )
+            || !fGHFriendTree->GetBranch( "Is_Gamma_70" )
+            || fGHFriendTree->SetBranchAddress( "runNumber", &GH_runNumber ) < 0
+            || fGHFriendTree->SetBranchAddress( "eventNumber", &GH_eventNumber ) < 0
+            || fGHFriendTree->SetBranchAddress( "Gamma_Prediction", &GH_Gamma_Prediction ) < 0
+            || fGHFriendTree->SetBranchAddress( "Is_Gamma_70", &GH_Is_Gamma ) < 0 )
+        {
+            cout << "CData error: invalid classification friend; regenerate with event IDs and matching types" << endl;
+            exit( EXIT_FAILURE );
+        }
     }
     else
     {

@@ -268,6 +268,8 @@ class CData
         Int_t           Dir_runNumber;            //!
         Int_t           Dir_eventNumber;          //!
         TTree*          fGHFriendTree;                 //!
+        Int_t           GH_runNumber; //!
+        Int_t           GH_eventNumber; //!
         float           GH_Gamma_Prediction;      //!
         UChar_t         GH_Is_Gamma;               //!
         vector<TFile*>  fXGBFiles;                //!

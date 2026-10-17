@@ -5,6 +5,8 @@
 
 #include "VStereoAnalysis.h"
 
+#include <limits>
+
 VStereoAnalysis::VStereoAnalysis( bool ion, string i_hsuffix, VAnaSumRunParameter* irunpara, vector< TDirectory* > iDirRun,
                                   TDirectory* iDirTot, string iDataDir, int iRandomSeed, bool iTotalAnalysisOnly )
 {
@@ -702,10 +704,12 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                 for( unsigned int t = 0; t < fRunPara->fRunList[fHisCounter].fTelToAnalyze.size(); t++ )
                 {
                     // for some runs LTrig is not filled!
-                    if( ( ( t + 1 ) & fDataRun->LTrig ) || ( fDataRun->LTrig == 0 ) )
+                    unsigned int iTelID = fRunPara->fRunList[fHisCounter].fTelToAnalyze[t];
+                    if( fDataRun->LTrig == 0 || ( iTelID < static_cast< unsigned int >( std::numeric_limits<ULong64_t>::digits )
+                                                  && ( ( 1ULL << iTelID ) & fDataRun->LTrig ) ) )
                     {
-                        fMeanAzimuth  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuth, fDataRun->TelAzimuth[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]] );
-                        fMeanElevation += fDataRun->TelElevation[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]];
+                        fMeanAzimuth  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuth, fDataRun->TelAzimuth[iTelID] );
+                        fMeanElevation += fDataRun->TelElevation[iTelID];
                         fNMeanElevation++;
                         break;
                     }
@@ -2290,8 +2294,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     fDL3EventTree_eventNumber    = c->eventNumber;
     fDL3EventTree_Time           = c->Time;         // Time of day (seconds) of gamma ray event
     fDL3EventTree_MJD            = c->MJD;
-    fDL3EventTree_Xoff           = c->Xoff;         // Gamma Point-Of-Origin, in camera coordinates (deg)
-    fDL3EventTree_Yoff           = c->Yoff;         // Gamma Point-Of-Origin, in camera coordinates (deg)
+    fDL3EventTree_Xoff           = c->get_Xoff( fRunPara->fDirectionReconstructionMethod );         // Gamma Point-Of-Origin, in camera coordinates (deg)
+    fDL3EventTree_Yoff           = c->get_Yoff( fRunPara->fDirectionReconstructionMethod );         // Gamma Point-Of-Origin, in camera coordinates (deg)
     fDL3EventTree_Xderot         = i_xderot;        // Derotated Gamma Point-Of-Origin (deg, RA)
     fDL3EventTree_Yderot         = i_yderot;        // Derotated Gamma Point-Of-Origin (deg, DEC)
     if( fCuts )
@@ -2314,7 +2318,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     fDL3EventTree_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
     if( fDL3_Acceptance )
     {
-        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( c->Xoff, c->Yoff );
+        pair<float, float> i_xyoff_derot = c->get_XYoff_derot( fRunPara->fDirectionReconstructionMethod );
+        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( i_xyoff_derot.first, i_xyoff_derot.second );
     }
     else
     {
