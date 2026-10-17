@@ -235,7 +235,7 @@ void VOnOff::doOnOffforSkyHistograms( TList* ionlist, TList* iofflist, TH2D* ial
                 {
                     int j_a = ialpha->GetYaxis()->FindBin( hTemp->GetYaxis()->GetBinCenter( j ) );
                     // normalisation factor must be nonzero
-                    if( ialpha->GetBinContent( i_a, j_a ) != 0. && hon->GetBinContent( i, j ) > 0. )
+                    if( ialpha->GetBinContent( i_a, j_a ) > 0. && hon->GetBinContent( i, j ) >= 0. && hoff->GetBinContent( i, j ) >= 0. )
                     {
                         hTemp->SetBinContent( i, j, hon->GetBinContent( i, j ) - hoff->GetBinContent( i, j )*ialpha->GetBinContent( i_a, j_a ) );
                         float iE = hon->GetBinContent( i, j ) + ialpha->GetBinContent( i_a, j_a ) * ialpha->GetBinContent( i_a, j_a ) * hoff->GetBinContent( i, j );
@@ -378,7 +378,7 @@ TH2D* VOnOff::do2DSignificance( TH2D* ion, TH2D* ioff, TH2D* ialpha, string itit
             int k_a = ialpha->GetYaxis()->FindBin( hmap_stereo_sig->GetYaxis()->GetBinCenter( k ) );
             double on  = ion->GetBinContent( j, k );
             double off = ioff->GetBinContent( j, k );
-            if( on > 0. && ialpha->GetBinContent( j_a, k_a ) > 0. )
+            if( on >= 0. && off >= 0. && ialpha->GetBinContent( j_a, k_a ) > 0. )
             {
                 hmap_stereo_sig->SetBinContent( j, k, VStatistics::calcSignificance( on, off, ialpha->GetBinContent( j_a, k_a ) ) );
             }
@@ -554,14 +554,14 @@ void VOnOff::fill1DSignificanceHistogram( double rmax )
     }
 
     double ir = 0.;
-    for( int j = 0; j < hmap_stereo_sig->GetNbinsX(); j++ )
+    for( int j = 1; j <= hmap_stereo_sig->GetNbinsX(); j++ )
     {
-        for( int k = 0; k < hmap_stereo_sig->GetNbinsY(); k++ )
+        for( int k = 1; k <= hmap_stereo_sig->GetNbinsY(); k++ )
         {
             ir  = hmap_stereo_sig->GetXaxis()->GetBinCenter( j ) * hmap_stereo_sig->GetXaxis()->GetBinCenter( j );
             ir += hmap_stereo_sig->GetYaxis()->GetBinCenter( k ) * hmap_stereo_sig->GetYaxis()->GetBinCenter( k );
             ir  = sqrt( ir );
-            if( ir < rmax && hmap_stereo_sig->GetBinContent( j, k ) != 0. )
+            if( ir < rmax && TMath::Finite( hmap_stereo_sig->GetBinContent( j, k ) ) && hmap_stereo_sig->GetBinContent( j, k ) > -9999. )
             {
                 h1Dsig->Fill( hmap_stereo_sig->GetBinContent( j, k ) );
             }
