@@ -288,7 +288,7 @@ bool write_reduced_merged_tree( vector< string > file_list,
         for( int b = 0; b < nbins; b++ )
         {
             ntemp_bin = hEcut->GetXaxis()->FindBin( e0[b] );
-            if( ntemp_bin > 0 && ntemp_bin < t_nbins )
+            if( ntemp_bin > 0 && ntemp_bin <= t_nbins )
             {
                 t_eff[ntemp_bin - 1] = eff[b];
                 t_effNoTh2[ntemp_bin - 1] =  effNoTh2[b];
