@@ -89,16 +89,6 @@ int main( int argc, char* argv[] )
     fRunPara->print();
 
     /////////////////////////////////////////////////////////////////
-    // open output file and write results to disk
-    TFile* fOutputfile = new TFile( fOutputfileName.c_str(), "RECREATE" );
-    if( fOutputfile->IsZombie() )
-    {
-        cout << "Error in opening output file: " << fOutputfile->GetName() << endl;
-        cout << "exiting..." << endl;
-        exit( EXIT_FAILURE );
-    }
-
-    /////////////////////////////////////////////////////////////////
     // gamma/hadron cuts
     VGammaHadronCuts* fCuts = new VGammaHadronCuts();
     fCuts->initialize( fRunPara->fEnergyReconstructionMethod, fRunPara->fDirectionReconstructionMethod );
@@ -191,6 +181,17 @@ int main( int argc, char* argv[] )
         cout << "Error: required XGB reconstruction/classification sidecar is missing" << endl;
         exit( EXIT_FAILURE );
     }
+
+    /////////////////////////////////////////////////////////////////
+    // open output file and write results to disk
+    TFile* fOutputfile = new TFile( fOutputfileName.c_str(), "RECREATE" );
+    if( fOutputfile->IsZombie() )
+    {
+        cout << "Error in opening output file: " << fOutputfile->GetName() << endl;
+        cout << "exiting..." << endl;
+        exit( EXIT_FAILURE );
+    }
+
     d.initialize_3tel_reconstruction(
         fRunPara->fRerunStereoReconstruction_3telescopes,
         fRunPara->fRerunStereoReconstruction_minAngle,
