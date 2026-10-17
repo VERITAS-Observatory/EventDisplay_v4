@@ -2314,7 +2314,8 @@ void VStereoAnalysis::fill_DL3Tree( CData* c, double i_xderot, double i_yderot, 
     fDL3EventTree_EmissionHeight = c->EmissionHeight ; // height of shower maximum (in km) above telescope z-plane
     if( fDL3_Acceptance )
     {
-        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( fDL3EventTree_Xoff, fDL3EventTree_Yoff );
+        pair<float, float> i_xyoff_derot = c->get_XYoff_derot( fRunPara->fDirectionReconstructionMethod );
+        fDL3EventTree_Acceptance     = fDL3_Acceptance->getAcceptance( i_xyoff_derot.first, i_xyoff_derot.second );
     }
     else
     {
