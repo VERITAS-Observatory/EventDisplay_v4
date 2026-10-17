@@ -112,10 +112,12 @@ int main( int argc, char* argv[] )
 
     cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
 
-    if( fCuts->useXGBoostCuts() || cutfilename.find( "XGB" ) != string::npos )
+    if( fCuts->useXGBoostCuts()
+            || fRunPara->fEnergyReconstructionMethod == 2
+            || fRunPara->fDirectionReconstructionMethod == 2 )
     {
-        cout << "Error: XGB radial acceptance requires reconstruction/classification sidecars; "
-             << "this executable does not support them. No acceptance will be generated." << endl;
+        cout << "Error: XGB reconstruction and classification are not supported by makeRadialAcceptance. "
+             << "No acceptance will be generated." << endl;
         exit( EXIT_FAILURE );
     }
 
@@ -184,7 +186,6 @@ int main( int argc, char* argv[] )
             cout << iAz_min[i] << " < az <= " <<   iAz_max[i] << endl;
         }
     }
-
 
     //////////////////////////////////////////////////////////////
     // main loop over all runs
