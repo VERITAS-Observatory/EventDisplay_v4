@@ -212,7 +212,7 @@ class VSensitivityCalculator : public TObject, public VPlotUtilities, public VHi
                 map< unsigned int, vector< double > > i_flux_NOff,
                 map< unsigned int, vector< double > > i_flux_NOff_error );
         bool       fillBackroundvsSquareDegree( TGraphAsymmErrors* i_R, TH1F* i_H );
-        void       fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha );
+        void       fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha, bool usePerBinAlpha = false );
         bool       getMonteCarlo_EffectiveArea( VSensitivityCalculatorDataResponseFunctions* iMCPara, double dE_Log10 );
         double     getMonteCarlo_Rate( unsigned int iE_low, unsigned int iE_up,
                                        VEnergySpectrumfromLiterature i_Espec, VSensitivityCalculatorDataResponseFunctions iMCPara,
