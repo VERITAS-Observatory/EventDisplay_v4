@@ -118,6 +118,7 @@ VRadialAcceptance::VRadialAcceptance( VGammaHadronCuts* icuts, VAnaSumRunParamet
     }
 
     fRunPar = irunpar;
+    fDirectionReconstructionMethod = fRunPar->fDirectionReconstructionMethod;
 
     // upper limit for zenith angle interval (18 == [0,18.])
     /*   fZe.push_back( 20. );
@@ -358,6 +359,7 @@ void VRadialAcceptance::reset()
 
     fRunPar = 0;
     fCuts = 0;
+    fDirectionReconstructionMethod = 0;
     hList = 0;
     hListNormalizeHistograms = 0;
     hListFitHistograms = 0;
