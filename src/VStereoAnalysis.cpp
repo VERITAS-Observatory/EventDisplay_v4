@@ -702,7 +702,7 @@ double VStereoAnalysis::fillHistograms( int icounter, int irun, double iAzMin, d
                 for( unsigned int t = 0; t < fRunPara->fRunList[fHisCounter].fTelToAnalyze.size(); t++ )
                 {
                     // for some runs LTrig is not filled!
-                    if( ( ( 1u << fRunPara->fRunList[fHisCounter].fTelToAnalyze[t] ) & fDataRun->LTrig ) || ( fDataRun->LTrig == 0 ) )
+                    if( ( ( 1ULL << fRunPara->fRunList[fHisCounter].fTelToAnalyze[t] ) & fDataRun->LTrig ) || ( fDataRun->LTrig == 0 ) )
                     {
                         fMeanAzimuth  = VSkyCoordinatesUtilities::addToMeanAzimuth( fMeanAzimuth, fDataRun->TelAzimuth[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]] );
                         fMeanElevation += fDataRun->TelElevation[fRunPara->fRunList[fHisCounter].fTelToAnalyze[t]];
