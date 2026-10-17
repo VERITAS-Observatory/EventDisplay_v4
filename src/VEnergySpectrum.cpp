@@ -70,6 +70,7 @@ void VEnergySpectrum::initializeRunVariables()
 
     hErecCountsOn = 0;
     hErecCountsOff = 0;
+    hErecBackground = 0;
     hErecTotalTime = 0;
     hErecTotalTimeDeadTimeCorrected = 0;
     hEffArea = 0;
@@ -422,6 +423,8 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
             rebinEnergySpectrum( hErecCountsOff, fAnalysisEnergyBinning, bLinearX );
             hErecCountsOff->Reset();
             hErecCountsOff->SetEntries( 0 );
+            hErecBackground = ( TH1D* )hErecCountsOff->Clone( "hErecBackground" );
+            hErecBackground->Sumw2();
             // histogram with total observation time
             if( bLinearX )
             {
@@ -482,6 +485,8 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
         // (counting histograms are not dead time corrected)
         addHistogram( hErecCountsOn, i_hErecCountsOn, fRunList[i].energyThreshold, bLinearX );
         addHistogram( hErecCountsOff, i_hErecCountOff, fRunList[i].energyThreshold, bLinearX );
+        // The preceding call has applied this run's threshold to the OFF histogram.
+        addHistogram( hErecBackground, i_hErecCountOff, 0., bLinearX, fRunList[i].alpha );
 
         // calculation of mean normalisation factor
         fTotalNormalisationFactor += fRunList[i].NOff * fRunList[i].alpha;
@@ -513,6 +518,18 @@ bool VEnergySpectrum::combineRuns( vector< int > runlist, bool bLinearX )
 
     cout << "total time [s]: " << fTotalObservationTime;
     cout << " (dead time corrected [s]: " << fTotalObservationTimeDeadTimeCorrected << ", ";
+    if( fRunList.size() > 1 )
+    {
+        for( unsigned int i = 1; i < fRunList.size(); i++ )
+        {
+            if( fabs( fRunList[i].alpha - fRunList[0].alpha ) > 1.e-8 )
+            {
+                cout << "Warning: unequal run alphas; Li&Ma/Rolke use per-bin effective alpha, "
+                     << "an approximation. Background and Poisson variance are summed per run." << endl;
+                break;
+            }
+        }
+    }
     cout << "total norm factor: " << fTotalNormalisationFactor << ")" << endl;
 
     bCombineRuns = true;
@@ -715,7 +732,7 @@ void VEnergySpectrum::addValueToHistogram( TH1* h, TGraph* g, double iTObs, doub
 /*
     this function is destructive to h2
 */
-void VEnergySpectrum::addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool bLinearX )
+void VEnergySpectrum::addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool bLinearX, double weight )
 {
     if( fDebug == 1 )
     {
@@ -756,7 +773,7 @@ void VEnergySpectrum::addHistogram( TH1* h1, TH1* h2, double iEThreshold, bool b
             }
         }
     }
-    h1->Add( h2 );
+    h1->Add( h2, weight );
 }
 
 
@@ -856,6 +873,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
     // keep track of on/off events and lost events
     double i_non = 0.;
     double i_noff = 0.;
+    double i_background_total = 0.;
     double i_non_cuts = 0.;
     double i_noff_cuts = 0.;
     double i_non_lost[4];
@@ -877,6 +895,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         // sum up number of on and off events
         i_non  += hErecCountsOn->GetBinContent( i );
         i_noff += hErecCountsOff->GetBinContent( i );
+        i_background_total += hErecBackground ? hErecBackground->GetBinContent( i ) : fTotalNormalisationFactor * hErecCountsOff->GetBinContent( i );
 
         // debug output
         if( fDebug == 3 )
@@ -1025,7 +1044,13 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         {
             cout << "\t\t total counts in bin after cuts: " << i << "\t" << i_non_cuts << "\t" << i_noff_cuts << endl;
         }
-        i_flux.NOff_alpha = fTotalNormalisationFactor;
+        i_flux.NOff_alpha = i_flux.NOff > 0.
+                           ? ( hErecBackground ? hErecBackground->GetBinContent( i ) / i_flux.NOff : fTotalNormalisationFactor )
+                           : fTotalNormalisationFactor;
+        if( i_flux.NOff_alpha <= 0. )
+        {
+            continue;
+        }
         // remove all empty bins
         if( i_flux.NOn == 0 && i_flux.NOff == 0 )
         {
@@ -1047,12 +1072,12 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         }
 
         // calculate significance (using Li&Ma, note: event number might be too low here for Li & Ma)
-        i_flux.Significance = VStatistics::calcSignificance( i_flux.NOn, i_flux.NOff, fTotalNormalisationFactor, fAnalysisLiAndMaEquation );
+        i_flux.Significance = VStatistics::calcSignificance( i_flux.NOn, i_flux.NOff, i_flux.NOff_alpha, fAnalysisLiAndMaEquation );
 
         // check that if this bin is significant using Rolke et al method
         TRolke i_Rolke;
         i_Rolke.SetCLSigmas( fAnalysisSignificance );
-        i_Rolke.SetPoissonBkgKnownEff( ( int )i_flux.NOn, ( int )i_flux.NOff, 1. / fTotalNormalisationFactor, 1. );
+        i_Rolke.SetPoissonBkgKnownEff( ( int )i_flux.NOn, ( int )i_flux.NOff, 1. / i_flux.NOff_alpha, 1. );
 
         ///////////////////////////////////////////////////////////////
         // calculate flux (check first that this is a significant bin)
@@ -1062,7 +1087,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
                 && i_flux.NOn > fAnalysisMinEvents )
         {
             // calculate flux and Poissonian flux error from event numbers
-            double i_ndiff = i_flux.NOn - i_flux.NOff * fTotalNormalisationFactor;
+            double i_ndiff = i_flux.NOn - i_flux.NOff * i_flux.NOff_alpha;
             if( fErrorCalculationMethod == "Rolke" )
             {
                 // this is wrong, but people want to have a mean value instead of a 1 sigma range
@@ -1088,7 +1113,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
                 i_flux.DifferentialFluxError_low = TMath::Abs( ( i_ndiff - i_Rolke.GetLowerLimit() ) * i_flux.DifferentialFlux / i_ndiff );
                 i_flux.DifferentialFluxError_up  = TMath::Abs( ( i_Rolke.GetUpperLimit() - i_ndiff ) * i_flux.DifferentialFlux  / i_ndiff );
                 // recalculate poissonian flux error
-                i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + fTotalNormalisationFactor * fTotalNormalisationFactor * i_flux.NOff )
+                i_flux.DifferentialFluxError =  sqrt( i_flux.NOn + ( hErecBackground ? hErecBackground->GetBinError( i ) * hErecBackground->GetBinError( i ) : i_flux.NOff_alpha * i_flux.NOff_alpha * i_flux.NOff ) )
                                                 * i_flux.DifferentialFlux / i_ndiff;
             }
             // that probably does not make sense
@@ -1102,7 +1127,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
         ///////////////////////////////////////
         else
         {
-            i_flux.DifferentialFlux = VStatistics::calcUpperLimit( i_flux.NOn, i_flux.NOff, fTotalNormalisationFactor,
+            i_flux.DifferentialFlux = VStatistics::calcUpperLimit( i_flux.NOn, i_flux.NOff, i_flux.NOff_alpha,
                                       fAnalysisUpperLimits, fAnalysisUpperLimitAlgorithm );
             // scale  upper flux to right value
             if( i_flux.DifferentialFlux > 0. && hEffArea )
@@ -1132,12 +1157,12 @@ void VEnergySpectrum::calculateDifferentialFluxes()
             cout << setprecision( 8 ) << "E " << i_flux.Energy_lowEdge << " - " << i_flux.Energy_upEdge;
             cout << ", NOn " << i_flux.NOn;
             cout << ", NOff " << i_flux.NOff;
-            cout << ", NDif " << i_flux.NOn - i_flux.NOff* fTotalNormalisationFactor;
+            cout << ", NDif " << i_flux.NOn - i_flux.NOff* i_flux.NOff_alpha;
             cout << ", Sign " << i_flux.Significance;
-            cout << ", Norm " << fTotalNormalisationFactor;
+            cout << ", Norm " << i_flux.NOff_alpha;
             cout << ", TOn " << i_flux.ObsTime;
             cout << ", Flux " << scientific << i_flux.DifferentialFlux;
-            cout << ", (F2 " << ( i_flux.NOn - i_flux.NOff * fTotalNormalisationFactor ) / i_flux.dE / i_flux.ObsTime
+            cout << ", (F2 " << ( i_flux.NOn - i_flux.NOff * i_flux.NOff_alpha ) / i_flux.dE / i_flux.ObsTime
                  / hEffArea->GetBinContent( hEffArea->FindBin( log10( i_flux.Energy ) ) ) * 1.e-4 << ")";
             cout << fixed << endl;
             cout << endl;
@@ -1148,7 +1173,7 @@ void VEnergySpectrum::calculateDifferentialFluxes()
     if( fDebug >= 2 )
     {
         cout << "total events " << fixed << setprecision( 8 ) << i_non << " " << i_noff;
-        cout << " " << fTotalNormalisationFactor << " " << i_non - fTotalNormalisationFactor* i_noff << endl;
+        cout << " " << fTotalNormalisationFactor << " " << i_non - i_background_total << endl;
     }
 }
 
@@ -1684,8 +1709,11 @@ TCanvas*  VEnergySpectrum::plotCountingHistograms( TCanvas* c )
     c->cd();
 
     hErecCountsOn->Draw( "same" );
-    TH1D* hErecCountsOff_Clone = ( TH1D* )hErecCountsOff->Clone();
-    hErecCountsOff_Clone->Scale( fTotalNormalisationFactor );
+    TH1D* hErecCountsOff_Clone = ( TH1D* )( hErecBackground ? hErecBackground : hErecCountsOff )->Clone();
+    if( !hErecBackground ) // legacy serialized spectra have no per-run background histogram
+    {
+        hErecCountsOff_Clone->Scale( fTotalNormalisationFactor );
+    }
     hErecCountsOff_Clone->Draw( "same" );
 
     // get counting values used for energy reconstruction
@@ -1705,9 +1733,9 @@ TCanvas*  VEnergySpectrum::plotCountingHistograms( TCanvas* c )
     for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
     {
         gErecOn->SetPoint( i, log10( fDifferentialFlux[i].EnergyWeightedMean ), fDifferentialFlux[i].NOn );
-        gErecOff->SetPoint( i, log10( fDifferentialFlux[i].EnergyWeightedMean ), fDifferentialFlux[i].NOff * fTotalNormalisationFactor );
+        gErecOff->SetPoint( i, log10( fDifferentialFlux[i].EnergyWeightedMean ), fDifferentialFlux[i].NOff * fDifferentialFlux[i].NOff_alpha );
         i_non += fDifferentialFlux[i].NOn;
-        i_noff += fDifferentialFlux[i].NOff * fTotalNormalisationFactor;
+        i_noff += fDifferentialFlux[i].NOff * fDifferentialFlux[i].NOff_alpha;
     }
     gErecOn->Draw( "p" );
     gErecOff->Draw( "p" );
@@ -1788,7 +1816,7 @@ void VEnergySpectrum::plotEventNumbers( Double_t ts )
     char hnum[500];
     for( unsigned int i = 0; i < fDifferentialFlux.size(); i++ )
     {
-        sprintf( hnum, "%.1f events (%.1f #sigma)", ( fDifferentialFlux[i].NOn - fTotalNormalisationFactor * fDifferentialFlux[i].NOff ),
+        sprintf( hnum, "%.1f events (%.1f #sigma)", ( fDifferentialFlux[i].NOn - fDifferentialFlux[i].NOff_alpha * fDifferentialFlux[i].NOff ),
                  fDifferentialFlux[i].Significance );
 
         double y  = ( fDifferentialFlux[i].DifferentialFlux + fDifferentialFlux[i].DifferentialFluxError ) * 1.75;
@@ -2152,7 +2180,7 @@ bool VEnergySpectrum::writeSpectralPointsToCSVFile( string iOFileName,
             }
             os << fDifferentialFlux[i].NOn << "    ";
             os << fDifferentialFlux[i].NOff << "    ";
-            os << fTotalNormalisationFactor << "    ";
+            os << fDifferentialFlux[i].NOff_alpha << "    ";
             os << fDifferentialFlux[i].Significance;
             os << endl;
         }
