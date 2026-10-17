@@ -962,6 +962,7 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpochFile, str
     string temp;
     string itemp_epoch = "not_found";
     bool matched = false;
+    bool runMJDsProvided = fDBDataStartTimeMJD != 0. || fDBDataStoppTimeMJD != 0.;
     bool runMJDsAvailable = fDBDataStartTimeMJD > 0. && fDBDataStoppTimeMJD > 0.;
     while( getline( is, is_line ) )
     {
@@ -1014,9 +1015,9 @@ bool VEvndispRunParameter::updateInstrumentEpochFromFile( string iEpochFile, str
             }
         }
     }
-    if( runMJDsAvailable && !matched )
+    if( runMJDsProvided && ( !runMJDsAvailable || !matched ) )
     {
-        cout << "Error: no " << iKeyWord << " interval covers run MJDs "
+        cout << "Error: no " << iKeyWord << " interval covers complete run MJDs "
              << fDBDataStartTimeMJD << " to " << fDBDataStoppTimeMJD << endl;
         exit( EXIT_FAILURE );
     }
