@@ -112,6 +112,15 @@ int main( int argc, char* argv[] )
 
     cout << "total number of files to read: " << fRunPara->fRunList.size() << endl;
 
+    if( fCuts->useXGBoostCuts()
+            || fRunPara->fEnergyReconstructionMethod == 2
+            || fRunPara->fDirectionReconstructionMethod == 2 )
+    {
+        cout << "Error: XGB reconstruction and classification are not supported by makeRadialAcceptance. "
+             << "No acceptance will be generated." << endl;
+        exit( EXIT_FAILURE );
+    }
+
     // create output file
     TFile* fo = new TFile( outfile.c_str(), "RECREATE" );
     if( fo->IsZombie() )
