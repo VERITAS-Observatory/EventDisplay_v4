@@ -759,6 +759,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     //////////////////////////////////////////////////////////////////////////////////////
     // get differential flux vector (used for differential and integral flux calculations)
     double alpha = 1.;
+    bool usePerBinAlpha = false;
     vector< VDifferentialFlux > fDifferentialFlux;
     if( iAnasumCrabFile == "MC" )
     {
@@ -781,6 +782,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     else
     {
         fDifferentialFlux = getDifferentFluxVectorfromData( iAnasumCrabFile, dE_Log10, alpha );
+        usePerBinAlpha = true;
     }
 
     if( fDifferentialFlux.size() == 0 )
@@ -796,6 +798,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     double non = 0;
     double non_error = 0.;
     double noff = 0;
+    double noff_background = 0.;
     double noff_error = 0.;
     double s = 0.;
     double s_error_U = 0.;
@@ -814,19 +817,27 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
     int z = 0;
     for( int i = fDifferentialFlux.size() - 1; i >= 0; i-- )
     {
+        double sensitivityAlpha = alpha;
         // integral spectrum: add number of events
         if( dE_Log10 < 0. )
         {
             non        += fDifferentialFlux[i].NOn;
             noff       += fDifferentialFlux[i].NOff;
+            noff_background += fDifferentialFlux[i].NOff * ( usePerBinAlpha ? fDifferentialFlux[i].NOff_alpha : alpha );
             non_error  += fDifferentialFlux[i].NOn_error * fDifferentialFlux[i].NOn_error;
             noff_error += fDifferentialFlux[i].NOff_error * fDifferentialFlux[i].NOff_error;
+            if( usePerBinAlpha && noff > 0. )
+            {
+                sensitivityAlpha = noff_background / noff;
+            }
         }
         // differential spectrum: number of events per differential bin
         else
         {
             non        = fDifferentialFlux[i].NOn;
             noff       = fDifferentialFlux[i].NOff;
+            sensitivityAlpha = usePerBinAlpha ? fDifferentialFlux[i].NOff_alpha : alpha;
+            noff_background = noff * sensitivityAlpha;
             non_error  = fDifferentialFlux[i].NOn_error * fDifferentialFlux[i].NOn_error;
             noff_error = fDifferentialFlux[i].NOff_error * fDifferentialFlux[i].NOff_error;
         }
@@ -858,7 +869,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
             double iN_on  = gRandom->Gaus( non, non_error );
             double iN_off = gRandom->Gaus( noff, noff_error );
             double i_s = getSensitivity( iN_on  / fDifferentialFlux[i].ObsTime * 60.,
-                                         iN_off / fDifferentialFlux[i].ObsTime * 60., alpha, -100., 0 );
+                                         iN_off / fDifferentialFlux[i].ObsTime * 60., sensitivityAlpha, -100., 0 );
             if( i_s > 0 )
             {
                 i_s_v[i_s_z] = i_s;
@@ -881,7 +892,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         }
         else
         {
-            s = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60., noff / fDifferentialFlux[i].ObsTime * 60., alpha, -100., 0 );
+            s = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60., noff / fDifferentialFlux[i].ObsTime * 60., sensitivityAlpha, -100., 0 );
             s_error_L = 0.;
             s_error_U = 0.;
         }
@@ -898,13 +909,13 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         int energy_intX3 = ( int )( energy * 1.e3 );
         // get sensitivity limitations
         fSignificanceLimited[energy_intX3]        = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 1 );
+                noff / fDifferentialFlux[i].ObsTime * 60., sensitivityAlpha, energy, 1 );
         fMinEventsLimited[energy_intX3]           = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 2 );
+                noff / fDifferentialFlux[i].ObsTime * 60., sensitivityAlpha, energy, 2 );
         fMinBackgroundEventsLimited[energy_intX3] = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 3 );
+                noff / fDifferentialFlux[i].ObsTime * 60., sensitivityAlpha, energy, 3 );
         fMinNoBackground[energy_intX3]            = getSensitivity( non / fDifferentialFlux[i].ObsTime * 60.,
-                noff / fDifferentialFlux[i].ObsTime * 60., alpha, energy, 4 );
+                noff / fDifferentialFlux[i].ObsTime * 60., sensitivityAlpha, energy, 4 );
 
         // fill sensitivity graphs
         double f1 = i_fFunCrabFlux->Eval( log10( fDifferentialFlux[i].Energy_lowEdge ) );
@@ -1002,7 +1013,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
             cout << endl;
             cout << "\t NON: " << non << " (+-" << non_error << ")";
             cout << "\t NOFF: " << noff << " (+-" << noff_error << ")";
-            cout << "\t NDIFF: " << non - alpha* noff  << ", alpha=" << alpha << "\t";
+            cout << "\t NDIFF: " << non - sensitivityAlpha * noff  << ", alpha=" << sensitivityAlpha << "\t";
             cout << fDifferentialFlux[i].ObsTime << " [s]\t" << scientific;
             cout << endl;
             cout << "\t FLUX: " << s << " (" << s_error_L << "," << s_error_U << ") [CU],  ";
@@ -1026,7 +1037,7 @@ bool VSensitivityCalculator::calculateSensitivityvsEnergyFromCrabSpectrum( strin
         gSensitivityvsEnergy->Print();
     }
 
-    fillParticleNumbersGraphs( fDifferentialFlux, alpha );
+    fillParticleNumbersGraphs( fDifferentialFlux, alpha, usePerBinAlpha );
     if( fPlotDebugName.size() > 0 )
     {
         plotDebugPlotsParticleNumbers();
@@ -2958,7 +2969,7 @@ void VSensitivityCalculator::plotDebugPlotsBackgroundParticleNumbers( vector< VD
     cPlotDebug[2]->Update();
 }
 
-void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha )
+void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlux > iDifferentialFlux, double alpha, bool usePerBinAlpha )
 {
     gSignalRate = new TGraphAsymmErrors( 1 );
     gBGRate     = new TGraphAsymmErrors( 1 );
@@ -2973,7 +2984,8 @@ void VSensitivityCalculator::fillParticleNumbersGraphs( vector< VDifferentialFlu
             gSignalRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOn / ( fObservationTime_h * 60. ) );
             gSignalRate->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
             gSignalRate->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
-            gBGRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * alpha / ( fObservationTime_h * 60. ) );
+            double iAlpha = usePerBinAlpha ? iDifferentialFlux[i].NOff_alpha : alpha;
+            gBGRate->SetPoint( z, log10( iDifferentialFlux[i].Energy ), iDifferentialFlux[i].NOff * iAlpha / ( fObservationTime_h * 60. ) );
             gBGRate->SetPointEXhigh( z, log10( iDifferentialFlux[i].Energy_upEdge ) - log10( iDifferentialFlux[i].Energy ) );
             gBGRate->SetPointEXlow( z, log10( iDifferentialFlux[i].Energy ) - log10( iDifferentialFlux[i].Energy_lowEdge ) );
             z++;
