@@ -1372,6 +1372,7 @@ TGraphAsymmErrors* VEnergySpectrum::getEnergySpectrumGraph()
    fSpectralFitFunction == 0 :  power law
    fSpectralFitFunction == 1 :  power law with exponential cutoff
    fSpectralFitFunction == 2 :  broken power law
+   fSpectralFitFunction == 5 :  power law with exponential cutoff (inverse cutoff energy)
 
 */
 TF1* VEnergySpectrum::fitEnergySpectrum( string iname, bool bDraw )
@@ -1498,6 +1499,12 @@ void VEnergySpectrum::plotFitValues()
 
         // 2) power law with exponential cutoff
         sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{-E/(%.2f#pm%.2f)} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_ecutoffV, i_ecutoffE );
+    }
+    else if( fSpectralFitFunction == 5 )
+    {
+        double i_inverseEcut = fEnergy->GetParameter( 2 );
+        double i_inverseEcutError = fEnergy->GetParError( 2 );
+        sprintf( hname, "(%.2f#pm%.2f)#times 10^{%d} (E/%.2f TeV)^{%.2f#pm%.2f}e^{-E(%.3f#pm%.3f) TeV^{-1}} [cm^{-2}s^{-1}TeV^{-1}]", i_manV, i_manE, i_expV, fSpectralFitter->getSpectralFitNormalisationEnergy(), i_indexV, i_indexE, i_inverseEcut, i_inverseEcutError );
     }
     else if( fSpectralFitFunction == 2 )
     {

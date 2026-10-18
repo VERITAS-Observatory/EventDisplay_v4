@@ -141,6 +141,7 @@ TF1* VSpectralFitter::fit( TGraph* g, string fitname )
    fSpectralFitFunction == 1 :  power law with exponential cutoff
    fSpectralFitFunction == 2 :  broken power law
    fSpectralFitFunction == 3 :  curved power law
+   fSpectralFitFunction == 5 :  power law with exponential cutoff (inverse cutoff energy)
 */
 bool VSpectralFitter::defineFitFunction()
 {
@@ -171,6 +172,19 @@ bool VSpectralFitter::defineFitFunction()
         fFitFunction->SetParameter( 1, -2. );
         fFitFunction->SetParameter( 2, 10. );
         sprintf( hname, "[0] * TMath::Power( x  / %f, [1] ) * TMath::Exp( -1. * x / [2] )", fSpectralFitFluxNormalisationEnergy );
+        fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
+    }
+    // power law with exponential cutoff parameterized by inverse cutoff energy
+    else if( fSpectralFitFunction == 5 )
+    {
+        cout << "Fitfunction: power law with exponential cutoff (inverse cutoff energy)" << endl;
+        sprintf( hname, "[0] * TMath::Power( TMath::Power( 10, x ) / %f, [1] ) * TMath::Exp( -1. * TMath::Power( 10, x ) * [2] )", fSpectralFitFluxNormalisationEnergy );
+        fFitFunction = new TF1( fFitName.c_str(), hname, log10( fSpectralFitEnergy_min ), log10( fSpectralFitEnergy_max ) );
+        fFitFunction->SetParameter( 0, 1.e-7 );
+        fFitFunction->SetParameter( 1, -2. );
+        fFitFunction->SetParameter( 2, 0.1 );
+        fFitFunction->SetParLimits( 2, 0., 1.e6 );
+        sprintf( hname, "[0] * TMath::Power( x / %f, [1] ) * TMath::Exp( -1. * x * [2] )", fSpectralFitFluxNormalisationEnergy );
         fFitFunction_lin = new TF1( iFitName_lin.c_str(), hname, fSpectralFitEnergy_min, fSpectralFitEnergy_max );
     }
     // broken power law fit
@@ -271,7 +285,7 @@ void VSpectralFitter::print()
         }
         cout << endl;
     }
-    else if( fSpectralFitFunction == 1 )
+    else if( fSpectralFitFunction == 1 || fSpectralFitFunction == 5 )
     {
         cout << "Results for power law fit with exponential cutoff: " << endl;
         cout << "--------------------------" << endl;
@@ -280,8 +294,16 @@ void VSpectralFitter::print()
         cout << " +- " << fFitFunction->GetParError( 0 ) << " cm^-2s^-1TeV^-1" << endl;
         cout << "Gamma = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 1 );
         cout << " +- " << fFitFunction->GetParError( 1 ) << endl;
-        cout << "Ecut = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 2 );
-        cout << " +- " << fFitFunction->GetParError( 2 ) << " TeV" << endl;
+        if( fSpectralFitFunction == 1 )
+        {
+            cout << "Ecut = " << fixed << setprecision( 2 ) << fFitFunction->GetParameter( 2 );
+            cout << " +- " << fFitFunction->GetParError( 2 ) << " TeV" << endl;
+        }
+        else
+        {
+            cout << "Inverse Ecut = " << fixed << setprecision( 3 ) << fFitFunction->GetParameter( 2 );
+            cout << " +- " << fFitFunction->GetParError( 2 ) << " TeV^-1" << endl;
+        }
         cout << "Chi2 " << setprecision( 2 ) << fFitFunction->GetChisquare();
         cout << ", N = " << fFitFunction->GetNDF();
         if( fFitFunction->GetNDF() > 0. )
