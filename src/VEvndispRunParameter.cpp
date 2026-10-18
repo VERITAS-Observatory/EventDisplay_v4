@@ -720,6 +720,7 @@ void VEvndispRunParameter::print( int iEv )
 	{
 		cout << "Low gain ped assumed: " << fsimu_lowgain_pedestal_DefaultPed;
 	}
+	cout << endl;
 	if( fsourcetype == 1 || fsourcetype == 5 )
 	{
 		cout << "telescope numbering offset: " << ftelescopeNOffset << endl;
