@@ -9,6 +9,33 @@ This changelog is generated using [Towncrier](https://towncrier.readthedocs.io/)
 
 <!-- towncrier release notes start -->
 
+## [v492.0-rc8](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0-rc8) - 2026-11-06
+
+### Bugfixes
+
+- Bug fix for filling reduced pointing tree when crossing UTC midnight. ([#371](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/371))
+- Effective-area production now stops with an error when the selected XGB reconstruction or gamma/hadron classification sidecar is missing. This prevents response products from being generated with incomplete XGB inputs. ([#373](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/373))
+- Preserve the final regular energy bin when writing reduced effective-area trees. ([#376](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/376))
+- Combined energy spectra now account for the background normalization in each energy bin, including run-specific energy thresholds. This improves background estimates, fluxes, and their uncertainties when combining runs with different thresholds or normalization factors. ([#377](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/377))
+- Radial acceptance generation now stops with an error when XGBoost reconstruction or classification is selected. This prevents incomplete acceptance products when the required XGBoost sidecars are not loaded. ([#379](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/379))
+- XGBoost classification sidecars are now checked against the event data before their predictions are used. Missing fields, unreadable entries, or run/event mismatches stop the analysis instead of silently applying incorrect gamma/hadron classifications. ([#380](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/380))
+- Significance maps and their one-dimensional distributions now retain valid pixels with zero on-source counts. This preserves downward fluctuations and empty pixels in the background significance distribution while excluding pixels with invalid exposure normalization. ([#382](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/382))
+- Acceptance maps and DL3 lookups now use the configured direction reconstruction, keeping 2D camera acceptance aligned with selected event directions. ([#383](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/383))
+- Mean telescope pointing now uses the local-trigger bit for each telescope's actual ID, so averages remain correct when analyzing a selected subset of telescopes. ([#384](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/384))
+- Low-gain pedestal files can again be generated from run/subrun lists, including identifiers longer than five digits. ([#385](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/385))
+- Reject instrument epoch files that do not contain an interval covering the run's start and stop MJDs, instead of silently using an unmatched epoch. ([#386](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/386))
+
+### New Feature
+
+- Add run and event number checks for XGB analysis. ([#371](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/371))
+- Lower the FADC stop-correction pulse-sum threshold for identifying good L2 channels from 300 to 100 dc. ([#375](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/375))
+- Add an alternative exponential cutoff power-law fit using the inverse cutoff energy in TeV⁻¹. The existing cutoff-energy fit remains available, so previous analyses keep their current parameterization. The inverse cutoff is constrained to nonnegative values to ensure the fitted spectrum represents a cutoff rather than exponential growth. ([#388](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/388))
+
+### Maintenance
+
+- Make container builds reproducible by cloning the versioned VBF C++17 source and downloading the pinned SOFA release from its official source. ([#375](https://github.com/VERITAS-Observatory/EventDisplay_v4/issues/375))
+
+
 ## [v492.0-rc7](https://github.com/VERITAS-Observatory/EventDisplay_v4/releases/tag/v492.0-rc7) - 2026-08-05
 
 ### Bugfixes
