@@ -28,7 +28,7 @@ cd sofa
 
 # get sofa package from the web page and install
 SOFAD="20231011"
-SOFA="sofa_c-${SOFAD}.tar.gz"
+SOFA="sofa_c-${SOFAD}tar.gz"
 if [[ -e sofa.tar.gz ]]; then
     mv -f sofa.tar.gz ${SOFA}
 else
