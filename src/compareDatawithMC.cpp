@@ -9,6 +9,7 @@
 
 #include "TFile.h"
 #include "TTree.h"
+#include "TParameter.h"
 
 #include <fstream>
 #include <iostream>
@@ -341,6 +342,14 @@ int main( int argc, char* argv[] )
     TH1D* hAzOn = 0;
     // output file
     TFile* fout = new TFile( fOutputfile.c_str(), "RECREATE" );
+    // Record the selection used for the angular histograms. Older files do not
+    // contain this information and cannot safely be used for containment fits.
+    double iAngularTheta2Cut = -1.;
+    if( fSingleTelescopeCuts == -3 )
+    {
+        iAngularTheta2Cut = fTheta2Cut < 0. ? 0.035 : fTheta2Cut;
+    }
+    TParameter<double>( "angularTheta2Cut", iAngularTheta2Cut ).Write();
 
     ////////////////////////////////////////////////
     // get AZ weighted histogram
