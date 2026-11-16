@@ -211,7 +211,8 @@ int main( int argc, char* argv[] )
         cout << "compareDatawithMC <input file list> <cut> <outputfile> ";
         cout << "[BDT gamma/hadron cuts] [epoch_ATM] [energy reconstruction method] ";
         cout << "[XGB stereo file suffix] [shower max zenith angle (default=20deg)] ";
-        cout << "[theta2 cut in deg2; <=0: use default] [direction reconstruction method]" << endl;
+        cout << "[theta2 cut in deg2; <0: default, 0: disabled] [direction reconstruction method] ";
+        cout << "[data XGB stereo file suffix]" << endl;
         cout << endl;
         cout << "\t input file list: see example file COMPAREMC.runparameter in the parameter files directory" << endl;
         cout << "\t cuts: " << endl;
@@ -229,8 +230,10 @@ int main( int argc, char* argv[] )
         cout << "\t cut file needs to be indicated within VDataMCComparision::initialGammaHadronCuts()" << endl;
         cout << endl;
         cout << "\t reconstruction methods: 0 = default, 2 = XGB stereo" << endl;
-        cout << "\t direction reconstruction method: optional final argument; defaults to the energy method" << endl;
-        cout << "\t XGB stereo file suffix: defaults to xgb_stereo for method 2" << endl;
+        cout << "\t direction reconstruction method: defaults to the energy method" << endl;
+        cout << "\t XGB stereo file suffix: MC suffix; defaults to xgb_stereo for method 2" << endl;
+        cout << "\t data XGB stereo file suffix: ON and OFF suffix; defaults to the MC suffix" << endl;
+        cout << "\t example suffixes: xgb_stereo_smear05 for MC and xgb_stereo for data" << endl;
         cout << endl;
         cout << "Note: most cuts are hardwired in VDataMCComparision::fillHistograms()" << endl;
         cout << endl;
@@ -289,11 +292,17 @@ int main( int argc, char* argv[] )
     {
         fXGBStereoFileSuffix = "xgb_stereo";
     }
+    string fDataXGBStereoFileSuffix = fXGBStereoFileSuffix;
+    if( argc > 11 )
+    {
+        fDataXGBStereoFileSuffix = argv[11];
+    }
     cout << "Stereo reconstruction methods for energy: " << fEnergyReconstructionMethod;
     cout << ", direction: " << fDirectionReconstructionMethod << endl;
     if( fEnergyReconstructionMethod == 2 || fDirectionReconstructionMethod == 2 )
     {
-        cout << "XGB stereo file suffix: " << fXGBStereoFileSuffix << endl;
+        cout << "MC XGB stereo file suffix: " << fXGBStereoFileSuffix << endl;
+        cout << "Data XGB stereo file suffix: " << fDataXGBStereoFileSuffix << endl;
     }
     cout << "Shower maximum zenith angle: " << fShowerMaxZe_deg << " deg" << endl;
     if( fTheta2Cut >= 0. )
@@ -341,7 +350,7 @@ int main( int argc, char* argv[] )
         {
             VDataMCComparision iTemp( fInputData[i].fType, fInputData[i].fNTelescopes );
             iTemp.setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
-            iTemp.setXGBStereoFileSuffix( fXGBStereoFileSuffix );
+            iTemp.setXGBStereoFileSuffix( fDataXGBStereoFileSuffix );
             iTemp.setAzRange( fInputData[i].fAz_deg_min, fInputData[i].fAz_deg_max );
             iTemp.setZeRange( fInputData[i].fZe_deg_min, fInputData[i].fZe_deg_max );
             hAzOn = iTemp.getAzimuthWeightingHistogram( fInputData[i].fFileName );
@@ -373,7 +382,8 @@ int main( int argc, char* argv[] )
         cout << "----" << endl;
         fStereoCompare.push_back( new VDataMCComparision( fInputData[i].fType, fInputData[i].fNTelescopes ) );
         fStereoCompare.back()->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
-        fStereoCompare.back()->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
+        fStereoCompare.back()->setXGBStereoFileSuffix( fInputData[i].fType == "SIMS"
+                ? fXGBStereoFileSuffix : fDataXGBStereoFileSuffix );
         fStereoCompare.back()->setShowerMaximZe_deg( fShowerMaxZe_deg );
         fStereoCompare.back()->setTheta2Cut( fTheta2Cut );
         if( fCalculateMVACut )
@@ -422,7 +432,7 @@ int main( int argc, char* argv[] )
     cout << "----" << endl;
     VDataMCComparision* fDiff = new VDataMCComparision( "DIFF", iNT );
     fDiff->setStereoReconstructionMethod( fEnergyReconstructionMethod, fDirectionReconstructionMethod );
-    fDiff->setXGBStereoFileSuffix( fXGBStereoFileSuffix );
+    fDiff->setXGBStereoFileSuffix( fDataXGBStereoFileSuffix );
     // assume 5 background regions
     fDiff->setOnOffHistograms( fStereoCompareOn, fStereoCompareOff, 1. / 5. );
     fDiff->writeHistograms( fOutputfile );
