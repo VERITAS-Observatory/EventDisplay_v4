@@ -95,3 +95,34 @@ Additional options for table reading:
 print run parameters for an existing mscw file
 
 	 -printrunparameters FILE
+
+### Exploratory Monte Carlo image smearing
+
+In lookup-table reading mode, `-imagesmearing=seed,fraction,size,width,length,centroid,asym,tgrad`
+perturbs image parameters before stereo image selection and reconstruction. It requires
+`-redo_stereo_reconstruction`, Monte Carlo evndisp input, and existing nominal
+lookup tables. For example:
+
+```sh
+mscw_energy -tablefile nominal.root -inputfile gamma.root -outputfile gamma_smeared.root \
+  -redo_stereo_reconstruction -imagesmearing=42,1,0.18,0.02,0.04,0.005,0.2,0.5
+```
+
+The example strengths are exploratory, not a detector calibration. The fraction is the
+probability of perturbing an event, shared by its images. Size receives an independent
+Gaussian perturbation in **log10(size)** with the specified standard deviation. Width,
+length and each centroid coordinate receive additive Gaussian perturbations in degrees;
+asymmetry and timing gradient use their native units. Positive width and length are
+floored at 1e-6 degrees. Centroid distance is recalculated from the smeared coordinates.
+Images must have a finite positive size and a readable `tpars` entry. By default only
+images selected by evndisp are read; use the existing `-use_evndisp_selected_images=0`
+option if the stereo rerun should consider all available images. Existing output selection
+still determines which events are written.
+
+The seed, fraction, strengths and algorithm version are stored in `TLRunParameter`.
+Version 1 uses event/run/telescope keyed random draws; these are reproducible for the
+same identifiers and seed, but do not reproduce NumPy's particular random numbers.
+The output image branches contain the values used by the reconstruction. Do not also
+activate Eventdisplay-ML image smearing on these files unless a second perturbation is
+intended. The smearing model uses independent Gaussian perturbations and needs validation
+against conditional data/MC distributions before production use.

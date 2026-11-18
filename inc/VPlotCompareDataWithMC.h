@@ -88,6 +88,7 @@ class VPlotCompareDataWithMC : public VHistogramUtilities
                 string iPlot = "SIMSDIFF", int iTelescope = 0,
                 double iSystematicCutCheck = -99., string iXVariable = "Erec",
                 double y_min = -99., bool iPlotLogY = false );
+        TCanvas* plot_angularContainment();
         TCanvas* single_telescope( int telid = -1 );
         TCanvas* single_telescope( int telid, string iPlot, bool iOneCanvas = true, int i_rebin = 1 );
         TCanvas* stereo_parameter();

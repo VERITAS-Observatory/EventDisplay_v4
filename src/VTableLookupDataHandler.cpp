@@ -6,6 +6,7 @@
 */
 
 #include "VTableLookupDataHandler.h"
+#include "VImageSmearing.h"
 
 VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunParameter* iT )
 {
@@ -542,6 +543,30 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
                 fmaxindex3[i] = ftpars[i]->index_of_max[2];
                 ftchisq_x[i] = ftpars[i]->tchisq_x;
             }
+            if( fTLRunParameter->fImageSmearing )
+            {
+                if( bShort )
+                {
+                    cerr << "image smearing requires full image parameters" << endl;
+                    exit( EXIT_FAILURE );
+                }
+                const VImageSmearing::Settings settings = {
+                    fTLRunParameter->fImageSmearingSeed, fTLRunParameter->fImageSmearingFraction,
+                    fTLRunParameter->fImageSmearingSize, fTLRunParameter->fImageSmearingWidth,
+                    fTLRunParameter->fImageSmearingLength, fTLRunParameter->fImageSmearingCentroid,
+                    fTLRunParameter->fImageSmearingAsym, fTLRunParameter->fImageSmearingTGrad
+                };
+                VImageSmearing::Image image = { fsize[i], fwidth[i], flength[i], fcen_x[i], fcen_y[i], fdist[i], fasym[i], ftgrad_x[i] };
+                VImageSmearing::apply( image, settings, runNumber, eventNumber, i );
+                fsize[i] = image.size;
+                fwidth[i] = image.width;
+                flength[i] = image.length;
+                fcen_x[i] = image.cen_x;
+                fcen_y[i] = image.cen_y;
+                fdist[i] = image.dist;
+                fasym[i] = image.asym;
+                ftgrad_x[i] = image.tgrad;
+            }
         }
         else
         {
@@ -1052,6 +1077,11 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     {
         fEventDisplayFileFormat = 1;
     }
+    if( fTLRunParameter->fImageSmearing && ( !fIsMC || fwrite ) )
+    {
+        cerr << "image smearing requires Monte Carlo input in lookup-table reading mode" << endl;
+        exit( EXIT_FAILURE );
+    }
     // for table filling: minimizing reading of trees
     if( fwrite )
     {
@@ -1085,6 +1115,19 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
         gErrorIgnoreLevel = 5000;
         if( iT->GetEntry( 0 ) > 0 )
         {
+            if( fTLRunParameter->fImageSmearing )
+            {
+                const char* required[] = { "size", "width", "length", "cen_x", "cen_y", "dist", "asymmetry", "tgrad_x" };
+                for( unsigned int j = 0; j < sizeof( required ) / sizeof( required[0] ); ++j )
+                {
+                    if( !iT->GetBranch( required[j] ) )
+                    {
+                        cerr << "image smearing requires tpars branch " << required[j]
+                             << " for telescope " << i + 1 << endl;
+                        exit( EXIT_FAILURE );
+                    }
+                }
+            }
             if( fEventDisplayFileFormat >= 2 )
             {
                 if( fEventDisplayFileFormat < 5 )

@@ -5,6 +5,93 @@
  */
 
 #include "VPlotCompareDataWithMC.h"
+#include "TFitResult.h"
+#include "TFitResultPtr.h"
+#include "TParameter.h"
+
+#include <cmath>
+
+namespace
+{
+// A two-component circular Gaussian has an exponential distribution in theta^2.
+double containmentRadius( double fraction, double scale1, double scale2 )
+{
+    double low = 0.;
+    double high = 50. * std::max( scale1, scale2 );
+    for( int i = 0; i < 100; i++ )
+    {
+        double mid = ( low + high ) / 2.;
+        if( fraction * exp( -mid / scale1 ) + ( 1. - fraction ) * exp( -mid / scale2 ) > 0.32 )
+        {
+            low = mid;
+        }
+        else
+        {
+            high = mid;
+        }
+    }
+    return sqrt( ( low + high ) / 2. );
+}
+
+bool fitContainment( TH1D* histogram, double fitMax, double& radius, double& error )
+{
+    if( !histogram || histogram->Integral() <= 0. )
+    {
+        return false;
+    }
+    TF1 model( "containment_model", "[0]*([1]/[2]*exp(-x/[2])+(1-[1])/[3]*exp(-x/[3]))", 0., fitMax );
+    model.SetParameters( histogram->Integral() * histogram->GetBinWidth( 1 ), 0.7, 0.005, 0.025 );
+    model.SetParLimits( 0, 1.e-9, histogram->Integral() * histogram->GetBinWidth( 1 ) * 100. );
+    model.SetParLimits( 1, 0.01, 0.99 );
+    model.SetParLimits( 2, 0.00005, 0.3 );
+    model.SetParLimits( 3, 0.00005, 0.3 );
+    TFitResultPtr fit = histogram->Fit( &model, "QSNRI" );
+    if( int( fit ) != 0 || !fit.Get() || fit->CovMatrixStatus() != 3 || fit->Ndf() <= 0
+            || fit->Chi2() / fit->Ndf() > 5. )
+    {
+        return false;
+    }
+    double p[3] = { fit->Parameter( 1 ), fit->Parameter( 2 ), fit->Parameter( 3 ) };
+    // Boundary solutions and containment beyond the fitted window are poorly
+    // constrained by the selected sample, even when the covariance is finite.
+    if( p[0] < 0.02 || p[0] > 0.98 || p[1] < 0.0001 || p[2] < 0.0001
+            || p[1] > 0.29 || p[2] > 0.29 )
+    {
+        return false;
+    }
+    radius = containmentRadius( p[0], p[1], p[2] );
+    if( radius * radius >= fitMax )
+    {
+        return false;
+    }
+    double gradient[3];
+    for( int i = 0; i < 3; i++ )
+    {
+        double step = p[i] * 1.e-4;
+        double saved = p[i];
+        p[i] = saved + step;
+        double upper = containmentRadius( p[0], p[1], p[2] );
+        p[i] = saved - step;
+        double lower = containmentRadius( p[0], p[1], p[2] );
+        p[i] = saved;
+        gradient[i] = ( upper - lower ) / ( 2. * step );
+    }
+    double variance = 0.;
+    for( int i = 0; i < 3; i++ )
+    {
+        for( int j = 0; j < 3; j++ )
+        {
+            variance += gradient[i] * fit->CovMatrix( i + 1, j + 1 ) * gradient[j];
+        }
+    }
+    if( !std::isfinite( radius ) || !std::isfinite( variance ) || variance <= 0. )
+    {
+        return false;
+    }
+    error = sqrt( variance );
+    return error < 0.5 * radius;
+}
+}
 
 VPlotCompareDataWithMC::VPlotCompareDataWithMC( string iFile )
 {
@@ -2316,6 +2403,67 @@ void VPlotCompareDataWithMC::mwr_vs_energy_plots( int iRebin, double xmin, doubl
  *
  */
 
+TCanvas* VPlotCompareDataWithMC::plot_angularContainment()
+{
+    if( !fDataFile )
+    {
+        return 0;
+    }
+    TH2D* sims = dynamic_cast<TH2D*>( fDataFile->Get( "htheta2Erec_SIMS" ) );
+    TH2D* excess = dynamic_cast<TH2D*>( fDataFile->Get( "htheta2Erec_DIFF" ) );
+    TParameter<double>* cut = dynamic_cast<TParameter<double>*>( fDataFile->Get( "angularTheta2Cut" ) );
+    TCanvas* canvas = new TCanvas( "cAngularContainment", "Angular containment", 900, 650 );
+    canvas->SetGrid();
+    canvas->SetBottomMargin( 0.20 );
+    TLatex text;
+    text.SetNDC();
+    text.SetTextSize( 0.035 );
+    if( !sims || !excess || !cut || cut->GetVal() < 0.03 || cut->GetVal() > 0.035 )
+    {
+        text.DrawLatex( 0.1, 0.75, "Containment unavailable: requires recorded #theta^{2} cut in [0.03, 0.035] deg^{2}." );
+        text.DrawLatex( 0.1, 0.68, "Regenerate the comparison with cut -3 and #theta^{2} cut 0.035 deg^{2}." );
+        return canvas;
+    }
+    TGraphErrors* graphs[2] = { new TGraphErrors(), new TGraphErrors() };
+    TH2D* inputs[2] = { sims, excess };
+    for( int sample = 0; sample < 2; sample++ )
+    {
+        for( int bin = 1; bin <= inputs[sample]->GetNbinsX(); bin++ )
+        {
+            TH1D* h = inputs[sample]->ProjectionY( Form( "containment_%d_%d", sample, bin ), bin, bin );
+            double radius = 0.;
+            double error = 0.;
+            if( fitContainment( h, 0.03, radius, error ) )
+            {
+                int point = graphs[sample]->GetN();
+                graphs[sample]->SetPoint( point, inputs[sample]->GetXaxis()->GetBinCenter( bin ), radius );
+                graphs[sample]->SetPointError( point, 0., error );
+            }
+            else
+            {
+                cout << "Containment fit unavailable: " << ( sample == 0 ? "MC" : "excess" )
+                     << ", energy bin " << bin << endl;
+            }
+            delete h;
+        }
+        graphs[sample]->SetMarkerStyle( sample == 0 ? 20 : 21 );
+        graphs[sample]->SetMarkerColor( sample == 0 ? kRed + 1 : kBlue + 1 );
+        graphs[sample]->SetLineColor( sample == 0 ? kRed + 1 : kBlue + 1 );
+    }
+    TH1F* frame = canvas->DrawFrame( sims->GetXaxis()->GetXmin(), 0., sims->GetXaxis()->GetXmax(), 0.4 );
+    frame->SetTitle( "Model-extrapolated 68% angular containment;log_{10}(E_{rec}/TeV);r_{68} [deg]" );
+    graphs[0]->Draw( "P SAME" );
+    graphs[1]->Draw( "P SAME" );
+    TLegend* legend = new TLegend( 0.66, 0.73, 0.88, 0.88 );
+    legend->AddEntry( graphs[0], "MC", "p" );
+    legend->AddEntry( graphs[1], "ON - #alpha OFF", "p" );
+    legend->Draw();
+    text.SetTextSize( 0.026 );
+    text.DrawLatex( 0.12, 0.09, "Two-Gaussian fit to #theta^{2} < 0.03 deg^{2}; extrapolated, statistical fit errors" );
+    text.DrawLatex( 0.12, 0.05, "Exploratory: tail model and reflected-region background require validation" );
+    return canvas;
+}
+
 void VPlotCompareDataWithMC::plot( string iPrintName )
 {
 
@@ -2695,6 +2843,11 @@ void VPlotCompareDataWithMC::plot( string iPrintName )
         cP->Print( hname );
     }
     cP = plot_energyDependentDistributions( "theta2", 1, 0., 0.04, "SIMSDIFF", 0 );
+    if( cP )
+    {
+        cP->Print( hname );
+    }
+    cP = plot_angularContainment();
     if( cP )
     {
         cP->Print( hname );
