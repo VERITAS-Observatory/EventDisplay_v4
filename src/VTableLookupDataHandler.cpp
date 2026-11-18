@@ -6,6 +6,7 @@
 */
 
 #include "VTableLookupDataHandler.h"
+#include "VImageSmearing.h"
 
 VTableLookupDataHandler::VTableLookupDataHandler( bool iwrite, VTableLookupRunParameter* iT )
 {
@@ -542,6 +543,30 @@ int VTableLookupDataHandler::fillNextEvent( bool bShort )
                 fmaxindex3[i] = ftpars[i]->index_of_max[2];
                 ftchisq_x[i] = ftpars[i]->tchisq_x;
             }
+            if( fTLRunParameter->fImageSmearing )
+            {
+                if( bShort )
+                {
+                    cerr << "image smearing requires full image parameters" << endl;
+                    exit( EXIT_FAILURE );
+                }
+                const VImageSmearing::Settings settings = {
+                    fTLRunParameter->fImageSmearingSeed, fTLRunParameter->fImageSmearingFraction,
+                    fTLRunParameter->fImageSmearingSize, fTLRunParameter->fImageSmearingWidth,
+                    fTLRunParameter->fImageSmearingLength, fTLRunParameter->fImageSmearingCentroid,
+                    fTLRunParameter->fImageSmearingAsym, fTLRunParameter->fImageSmearingTGrad
+                };
+                VImageSmearing::Image image = { fsize[i], fwidth[i], flength[i], fcen_x[i], fcen_y[i], fdist[i], fasym[i], ftgrad_x[i] };
+                VImageSmearing::apply( image, settings, runNumber, eventNumber, i );
+                fsize[i] = image.size;
+                fwidth[i] = image.width;
+                flength[i] = image.length;
+                fcen_x[i] = image.cen_x;
+                fcen_y[i] = image.cen_y;
+                fdist[i] = image.dist;
+                fasym[i] = image.asym;
+                ftgrad_x[i] = image.tgrad;
+            }
         }
         else
         {
@@ -1051,6 +1076,11 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     else
     {
         fEventDisplayFileFormat = 1;
+    }
+    if( fTLRunParameter->fImageSmearing && ( !fIsMC || bShort || fwrite ) )
+    {
+        cerr << "image smearing requires full-format Monte Carlo input in lookup-table reading mode" << endl;
+        exit( EXIT_FAILURE );
     }
     // for table filling: minimizing reading of trees
     if( fwrite )

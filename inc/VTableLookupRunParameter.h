@@ -100,6 +100,18 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         string fDispSign_BDTFileName;
         bool fDisp_UseIntersectForHeadTail;
 
+        // Optional event-keyed MC image perturbations; size sigma is in log10 units.
+        bool fImageSmearing;
+        unsigned int fImageSmearingSeed;
+        double fImageSmearingFraction;
+        double fImageSmearingSize;
+        double fImageSmearingWidth;
+        double fImageSmearingLength;
+        double fImageSmearingCentroid;
+        double fImageSmearingAsym;
+        double fImageSmearingTGrad;
+        unsigned int fImageSmearingVersion;
+
         // functions...
         VTableLookupRunParameter();
         ~VTableLookupRunParameter() {}
@@ -108,6 +120,6 @@ class VTableLookupRunParameter : public TNamed, public VGlobalRunParameter
         void print( int iB = 0 );
         void printHelp();
 
-        ClassDef( VTableLookupRunParameter, 33 );
+        ClassDef( VTableLookupRunParameter, 34 );
 };
 #endif

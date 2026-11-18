@@ -5,6 +5,11 @@
 
 #include "VTableLookupRunParameter.h"
 
+#include <cerrno>
+#include <cmath>
+#include <limits>
+#include <sstream>
+
 ClassImp( VTableLookupRunParameter )
 
 VTableLookupRunParameter::VTableLookupRunParameter()
@@ -42,6 +47,12 @@ VTableLookupRunParameter::VTableLookupRunParameter()
     fminfitstat = -10.;
     fSelectRandom = -1.;
     fSelectRandomSeed = 17;
+    fImageSmearing = false;
+    fImageSmearingSeed = 0;
+    fImageSmearingFraction = 1.;
+    fImageSmearingSize = fImageSmearingWidth = fImageSmearingLength = 0.;
+    fImageSmearingCentroid = fImageSmearingAsym = fImageSmearingTGrad = 0.;
+    fImageSmearingVersion = 1;
     fRerunStereoReconstruction = false;
     fRerunStereoReconstruction_minAngle = -1.;
     fRerunStereoReconstruction_BDTFileName = "";
@@ -175,6 +186,61 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
                 cout << "unknown parameter, choose 1=fill or 0=read lookup tables" << endl;
                 return false;
             }
+        }
+        else if( iTemp.find( "-imagesmearing=" ) == 0 || iTemp.find( "--imagesmearing=" ) == 0 )
+        {
+            string values = iTemp.substr( iTemp.find( '=' ) + 1 );
+            string token;
+            vector<string> fields;
+            stringstream parts( values );
+            while( getline( parts, token, ',' ) )
+            {
+                fields.push_back( token );
+            }
+            if( fields.size() != 8 || values.empty() || values.back() == ',' )
+            {
+                cerr << "error: -imagesmearing requires seed,fraction,size,width,length,centroid,asym,tgrad" << endl;
+                exit( EXIT_FAILURE );
+            }
+            char* end = 0;
+            errno = 0;
+            if( fields[0].empty() || fields[0].find_first_not_of( "0123456789" ) != string::npos )
+            {
+                cerr << "error: image smearing seed must be an unsigned 32-bit integer" << endl;
+                exit( EXIT_FAILURE );
+            }
+            unsigned long seed = strtoul( fields[0].c_str(), &end, 10 );
+            if( errno == ERANGE || *end || seed > numeric_limits<unsigned int>::max() )
+            {
+                cerr << "error: image smearing seed must be an unsigned 32-bit integer" << endl;
+                exit( EXIT_FAILURE );
+            }
+            double parsed[7];
+            for( unsigned int j = 0; j < 7; ++j )
+            {
+                errno = 0;
+                const char* begin = fields[j + 1].c_str();
+                parsed[j] = strtod( begin, &end );
+                if( begin == end || *end || errno == ERANGE || !std::isfinite( parsed[j] ) || parsed[j] < 0. || ( j == 0 && parsed[j] > 1. ) )
+                {
+                    cerr << "error: invalid image smearing fraction or strength" << endl;
+                    exit( EXIT_FAILURE );
+                }
+            }
+            fImageSmearing = true;
+            fImageSmearingSeed = static_cast<unsigned int>( seed );
+            fImageSmearingFraction = parsed[0];
+            fImageSmearingSize = parsed[1];
+            fImageSmearingWidth = parsed[2];
+            fImageSmearingLength = parsed[3];
+            fImageSmearingCentroid = parsed[4];
+            fImageSmearingAsym = parsed[5];
+            fImageSmearingTGrad = parsed[6];
+        }
+        else if( iTemp == "-imagesmearing" || iTemp == "--imagesmearing" )
+        {
+            cerr << "error: -imagesmearing requires =seed,fraction,size,width,length,centroid,asym,tgrad" << endl;
+            exit( EXIT_FAILURE );
         }
         // rerun the stero reconstruction
         else if( iTemp.find( "-redo_stereo_reconstruction" ) < iTemp.size() )
@@ -375,6 +441,11 @@ bool VTableLookupRunParameter::fillParameters( int argc, char* argv[] )
             fMaxRunTime = atof( iTemp.substr( iTemp.rfind( "=" ) + 1, iTemp.size() ).c_str() );
         }
     }
+    if( fImageSmearing && ( !fRerunStereoReconstruction || readwrite == 'W' ) )
+    {
+        cerr << "error: image smearing requires stereo reconstruction rerun and lookup-table reading mode" << endl;
+        exit( EXIT_FAILURE );
+    }
     // filling of tables requires Monte Carlo
     if( readwrite == 'W' )
     {
@@ -506,6 +577,13 @@ void VTableLookupRunParameter::print( int iP )
     cout << "mscw_energy VERSION " << getEVNDISP_VERSION() << endl;
     cout << endl;
     cout << "debug level " << fDebug << endl;
+    if( fImageSmearing )
+    {
+        cout << "MC image smearing version " << fImageSmearingVersion << ": seed " << fImageSmearingSeed
+             << ", fraction " << fImageSmearingFraction << ", sigmas (log10 size, width, length, centroid, asym, tgrad) "
+             << fImageSmearingSize << ", " << fImageSmearingWidth << ", " << fImageSmearingLength << ", "
+             << fImageSmearingCentroid << ", " << fImageSmearingAsym << ", " << fImageSmearingTGrad << endl;
+    }
     cout << "lookuptable: " << tablefile << endl;
     cout << endl;
     cout << "evndisp reconstruction parameter ID: " << rec_method << endl;
