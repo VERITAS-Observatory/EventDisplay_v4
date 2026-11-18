@@ -1077,9 +1077,9 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
     {
         fEventDisplayFileFormat = 1;
     }
-    if( fTLRunParameter->fImageSmearing && ( !fIsMC || bShort || fwrite ) )
+    if( fTLRunParameter->fImageSmearing && ( !fIsMC || fwrite ) )
     {
-        cerr << "image smearing requires full-format Monte Carlo input in lookup-table reading mode" << endl;
+        cerr << "image smearing requires Monte Carlo input in lookup-table reading mode" << endl;
         exit( EXIT_FAILURE );
     }
     // for table filling: minimizing reading of trees
@@ -1115,6 +1115,19 @@ bool VTableLookupDataHandler::setInputFile( vector< string > iInput )
         gErrorIgnoreLevel = 5000;
         if( iT->GetEntry( 0 ) > 0 )
         {
+            if( fTLRunParameter->fImageSmearing )
+            {
+                const char* required[] = { "size", "width", "length", "cen_x", "cen_y", "dist", "asymmetry", "tgrad_x" };
+                for( unsigned int j = 0; j < sizeof( required ) / sizeof( required[0] ); ++j )
+                {
+                    if( !iT->GetBranch( required[j] ) )
+                    {
+                        cerr << "image smearing requires tpars branch " << required[j]
+                             << " for telescope " << i + 1 << endl;
+                        exit( EXIT_FAILURE );
+                    }
+                }
+            }
             if( fEventDisplayFileFormat >= 2 )
             {
                 if( fEventDisplayFileFormat < 5 )

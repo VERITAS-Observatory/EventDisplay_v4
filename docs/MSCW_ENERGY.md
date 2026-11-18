@@ -100,7 +100,7 @@ print run parameters for an existing mscw file
 
 In lookup-table reading mode, `-imagesmearing=seed,fraction,size,width,length,centroid,asym,tgrad`
 perturbs image parameters before stereo image selection and reconstruction. It requires
-`-redo_stereo_reconstruction`, full-format Monte Carlo evndisp input, and existing nominal
+`-redo_stereo_reconstruction`, Monte Carlo evndisp input, and existing nominal
 lookup tables. For example:
 
 ```sh
